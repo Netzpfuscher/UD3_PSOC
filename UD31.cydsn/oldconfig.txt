@@ -1,0 +1,88 @@
+//the structure for the user-controlled configuration
+//typedef struct 
+//{
+//    uint16 max_tr_pw;       //uSec
+//                            //maximum allowed pulsewidth in transient mode
+//    uint16 max_tr_prf;      //Hz
+//                            //maximum allowed pulse repetition frequency in transient mode
+//    uint16 max_qcw_pw;      //uSec*10
+//                            //maximum allowed pulse duration in QCW mode.  
+//    uint16 max_tr_current; //Amps
+//                            //maximum allowed limit setting for CT1 (primary) input
+//    uint16 max_ct2_current; //milliAmps
+//                            //maximum allowed limit setting for CT2 (secondary) input
+//    uint16 max_i2t;         //amp^2*t
+//                            //maximum I^2*t value, used as a pulsewidth limiter
+//    uint16 max_qcw_current; //amps
+//                            //current limiter setting for QCW mode
+//    uint8 temp1_max;        //*C
+//                            //disables drive above this temp
+//    uint8 temp2_max;        //*C
+//                            //disables drive above this temp
+//    uint8 psb_start_val;	//15.625nS counts
+//                            //disables drive above this temp
+//    uint16 ct1_ratio;       //N turns
+//                            //used for calculating current limit settings
+//    uint16 ct2_ratio;       //N turns
+//                            //used for calculating current limit settings
+//    uint16 lead_time;       //nSec
+//                            //desired switching timing 
+//    uint16 start_freq;      //Hz*100
+//                            //used for starting frequency
+//    uint8 start_cycles;     //number of half cycles
+//                            //used for starting frequency
+//    uint8 channel_id;       //used for filtering UART data when multiple UDs are in use
+//    uint16 max_tr_duty;     //max transient mode duty cycle in 0.1% increment
+//    uint16 max_qcw_duty;    //max QCW duty cycle in 0.1% increment
+//    uint8 temp1_setpoint;
+//    uint8 hf_glitch_detect;
+//    uint8 lf_glitch_detect;
+//    uint8 midi_volume_control;
+//    uint8 midi_aftertouch_control;
+//    uint8 midi_velocity_control;
+//    uint8 min_tr_current;
+//    uint8 ext_trig_enable;
+//    uint8 pb_reset;         //if set, pitch bend will be reset on each new midi note event
+//    uint16 batt_lockout_v;  //in volts
+//    uint16 ct2_burden;      //in deciOhms
+//    uint16 ct1_burden;      //in deciOhms
+//	uint16 SLR_Fswitch;		//in 0.1khz increment
+//	uint16 SLR_Vbus;		//in Volts
+//	uint8 PSscheme;			//used to select how the pre-charge/battery lockout etc function
+//} ud3cfg;
+//ud3cfg config, defconfig;
+
+//ud3cfg defconfig;
+
+    //test initialization!
+//	defconfig.max_tr_pw 			= 1000; //uSec
+//	defconfig.max_tr_prf 			= 800; //Hz
+//	defconfig.max_qcw_pw 			= 10000; //uSec
+//	defconfig.max_tr_current 		= 250; //Amps
+//	defconfig.max_qcw_current 		= 150; //amps
+//	defconfig.temp1_max				= 40; //*C
+//	defconfig.temp2_max			 	= 40; //*C
+//	defconfig.psb_start_val 		= 10; //15.625nS counts
+//	defconfig.ct1_ratio 			= 245; //N turns
+//	defconfig.ct2_ratio 			= 2000; //N turns
+//	defconfig.lead_time	 			= 500; //nSec
+//	defconfig.start_freq 			= 3762; //Hz*100
+//	defconfig.start_cycles 			= 6; //number of cycles
+//	defconfig.channel_id 			= 0;
+//	defconfig.max_tr_duty 			= 100;
+//	defconfig.max_qcw_duty 			= 350;    //max QCW duty cycle in 0.1% increment
+//	defconfig.temp1_setpoint 		= 30;
+//	defconfig.hf_glitch_detect 		= 0;
+//	defconfig.lf_glitch_detect 		= 0;
+//	defconfig.midi_volume_control 	= 0;
+//	defconfig.midi_aftertouch_control = 0;
+//	defconfig.midi_velocity_control = 0;
+//	defconfig.min_tr_current 		= 100;
+//	defconfig.ext_trig_enable 		= 0;
+//	defconfig.pb_reset 				= 1;
+//	defconfig.batt_lockout_v 		= 360;
+//	defconfig.ct2_burden 			= 500; //in deciOhms
+//	defconfig.ct1_burden 			= 33; //in deciOhms
+//	defconfig.SLR_Fswitch 			= 500;
+//	defconfig.SLR_Vbus				= 200;
+//	defconfig.PSscheme 				= 0;	//see charging.h for schemes
