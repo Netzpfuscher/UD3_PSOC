@@ -1,14 +1,8 @@
-/* ========================================
- *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
- * ========================================
-*/
+/*
+ * Copyright (c) 2018 Jens Kerrinnes
+ * LICENCE: MIT License (look at /LICENCE.md)
+ */
+ 
 #include "project.h"
 #define tsk_usb_BUFFER_LEN 64
 #include <stdio.h>

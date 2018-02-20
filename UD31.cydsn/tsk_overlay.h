@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2014 Steve Ward
+ * Copyright (c) 2018 Jens Kerrinnes
+ * LICENCE: MIT License (look at /LICENCE.md)
+ */
+    
 #if !defined(overlay_TASK_H)
 	#define overlay_TASK_H
 

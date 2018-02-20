@@ -1,4 +1,9 @@
 /*
+/*
+ * Copyright (c) 2014 Steve Ward
+ * Copyright (c) 2018 Jens Kerrinnes
+ * LICENCE: MIT License (look at /LICENCE.md)
+
 
 The internal_interrupter enables the ZCDtoPWM hardware.  
 Its a 16 bit PWM clocked at 1MHz, so thats 1uS per count.

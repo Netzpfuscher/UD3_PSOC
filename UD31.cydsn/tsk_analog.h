@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2014 Steve Ward
+ * Copyright (c) 2018 Jens Kerrinnes
+ * LICENCE: MIT License (look at /LICENCE.md)
+ */
+    
 #if !defined(tsk_analog_TASK_H)
 	#define tsk_analog_TASK_H
 

@@ -1,18 +1,8 @@
-/*UD3 USB Code!!!
-
-Code designed on/for PSoC Creator V4.0
-
-Tips for playing with the UD3 without an external controller:
-
-Running test QCW pulses:
-1) in "UD3config.h" near the top of the file, set "ext_trig_runs_CW        1" (make sure to undo this later!)
-2) Set the "config.max_qcw_pw" to desired value (units are uS*10).
-3) engaging the trigger/enable should fire a 10mS or so ramp that holds maximum voltage 
-    until either the QCW pulse limiter stops it, or you let go of the switch. 
-
-
- * ========================================
-*/
+/*
+ * Copyright (c) 2014 Steve Ward
+ * Copyright (c) 2018 Jens Kerrinnes
+ * LICENCE: MIT License (look at /LICENCE.md)
+ */
 
 #include <device.h>
 #include "DMA.h"
