@@ -68,7 +68,7 @@ void initialize_interrupter(void) {
 
 	QCW_duty_limiter_WritePeriod(65535);
 	QCW_duty_limiter_WriteCompare(
-	    65535 - confparam[CONF_MAX_QCW_PW].value); // this register sets the max PW output
+		65535 - confparam[CONF_MAX_QCW_PW].value); // this register sets the max PW output
 
 	int1_prd = 65000;
 	int1_cmp = 64999;
@@ -90,7 +90,7 @@ void initialize_interrupter(void) {
 
 	if (confparam[CONF_EXT_TRIG_ENABLE].value) {
 		trigger_bypass_Write(0); // 0 enables the trigger input, 1 bypasses it so the
-					 // interrupter can always run
+								 // interrupter can always run
 	} else {
 		trigger_bypass_Write(1);
 	}
@@ -101,26 +101,26 @@ void initialize_interrupter(void) {
 	uint8 int1_dma_Chan;
 	uint8 int1_dma_TD[4];
 	int1_dma_Chan = int1_dma_DmaInitialize(int1_dma_BYTES_PER_BURST, int1_dma_REQUEST_PER_BURST,
-					       HI16(int1_dma_SRC_BASE), HI16(int1_dma_DST_BASE));
+										   HI16(int1_dma_SRC_BASE), HI16(int1_dma_DST_BASE));
 	int1_dma_TD[0] = CyDmaTdAllocate();
 	int1_dma_TD[1] = CyDmaTdAllocate();
 	int1_dma_TD[2] = CyDmaTdAllocate();
 	int1_dma_TD[3] = CyDmaTdAllocate();
 	CyDmaTdSetConfiguration(int1_dma_TD[0], 2, int1_dma_TD[1],
-				int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
+							int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
 	CyDmaTdSetConfiguration(int1_dma_TD[1], 2, int1_dma_TD[2],
-				int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
+							int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
 	CyDmaTdSetConfiguration(int1_dma_TD[2], 2, int1_dma_TD[3],
-				int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
+							int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
 	CyDmaTdSetConfiguration(int1_dma_TD[3], 2, int1_dma_TD[0], int1_dma__TD_TERMOUT_EN);
 	CyDmaTdSetAddress(int1_dma_TD[0], LO16((uint32)&int1_prd),
-			  LO16((uint32)interrupter1_PERIOD_LSB_PTR));
+					  LO16((uint32)interrupter1_PERIOD_LSB_PTR));
 	CyDmaTdSetAddress(int1_dma_TD[1], LO16((uint32)&int1_cmp),
-			  LO16((uint32)interrupter1_COMPARE1_LSB_PTR));
+					  LO16((uint32)interrupter1_COMPARE1_LSB_PTR));
 	CyDmaTdSetAddress(int1_dma_TD[2], LO16((uint32)&int1_prd),
-			  LO16((uint32)interrupter1_COMPARE2_LSB_PTR));
+					  LO16((uint32)interrupter1_COMPARE2_LSB_PTR));
 	CyDmaTdSetAddress(int1_dma_TD[3], LO16((uint32)&int1_prd),
-			  LO16((uint32)interrupter1_COUNTER_LSB_PTR));
+					  LO16((uint32)interrupter1_COUNTER_LSB_PTR));
 	CyDmaChSetInitialTd(int1_dma_Chan, int1_dma_TD[0]);
 	CyDmaChEnable(int1_dma_Chan, 1);
 }
@@ -133,26 +133,25 @@ void ramp_control(void) {
 			// QCW_duty_limiter PWM, then calculate the permissible PW for that PWM
 			if (qcw_dl_ovf_counter)
 				ramp.qcw_recorded_prd = 65535; // if there was an overflow of this
-							       // PWM, then the period is > 655mS,
-							       // so clamp it there
+											   // PWM, then the period is > 655mS,
+											   // so clamp it there
 			else
-				ramp.qcw_recorded_prd =
-				    65535 - QCW_duty_limiter_ReadCounter(); // else, look at the
-									    // counter to see where
-									    // we are at since last
-									    // pulse
+				ramp.qcw_recorded_prd = 65535 - QCW_duty_limiter_ReadCounter(); // else, look at the
+			// counter to see where
+			// we are at since last
+			// pulse
 			qcw_dl_ovf_counter = 0;
 			ramp.qcw_limiter_pw =
-			    (ramp.qcw_recorded_prd * confparam[CONF_MAX_QCW_DUTY].value) / 1000;
+				(ramp.qcw_recorded_prd * confparam[CONF_MAX_QCW_DUTY].value) / 1000;
 			if ((ramp.qcw_limiter_pw > confparam[CONF_MAX_QCW_PW].value) ||
-			    (ramp.qcw_limiter_pw == 0)) {
+				(ramp.qcw_limiter_pw == 0)) {
 				ramp.qcw_limiter_pw = confparam[CONF_MAX_QCW_PW].value;
 			}
 			// the next stuff is time sensitive, so disable interrupts to avoid glitches
 			CyGlobalIntDisable;
 			QCW_duty_limiter_WriteCounter(65535); // restart counter at top value
 			QCW_duty_limiter_WriteCompare(
-			    65535 - ramp.qcw_limiter_pw); // put in limiting compare match value
+				65535 - ramp.qcw_limiter_pw); // put in limiting compare match value
 			// now enable the QCW interrupter
 			QCW_enable_Control = 1;
 			watchdog_reset_Control = 1;
@@ -161,15 +160,13 @@ void ramp_control(void) {
 			CyGlobalIntEnable;
 		} else {
 			// linearize modulation value based on fb_filter_out period
-			ramp.shift_period =
-			    (ramp.modulation_value * (params.pwm_top - fb_filter_out)) >> 8;
+			ramp.shift_period = (ramp.modulation_value * (params.pwm_top - fb_filter_out)) >> 8;
 			// assign new modulation value to the params.pwmb_psb_val ram
-			if ((ramp.shift_period + params.pwmb_start_psb_val) >
-			    (params.pwmb_start_prd - 4)) {
+			if ((ramp.shift_period + params.pwmb_start_psb_val) > (params.pwmb_start_prd - 4)) {
 				params.pwmb_psb_val = 4;
 			} else {
-				params.pwmb_psb_val = params.pwm_top - (ramp.shift_period +
-									params.pwmb_start_psb_val);
+				params.pwmb_psb_val =
+					params.pwm_top - (ramp.shift_period + params.pwmb_start_psb_val);
 			}
 		}
 	} else //(ramp.modulation_value == 0) //indicates the switching should stop
@@ -182,8 +179,7 @@ void ramp_control(void) {
 
 void interrupter_oneshot(uint16_t pw, uint8_t vol) {
 	if (vol < 127) {
-		ct1_dac_val[0] =
-		    params.min_tr_cl_dac_val + ((vol * params.diff_tr_cl_dac_val) >> 7);
+		ct1_dac_val[0] = params.min_tr_cl_dac_val + ((vol * params.diff_tr_cl_dac_val) >> 7);
 	} else {
 		ct1_dac_val[0] = params.max_tr_cl_dac_val;
 	}
@@ -226,7 +222,7 @@ void update_interrupter() {
 	uint16 total_duty;
 	uint16 new_duty;
 	interrupter.duty =
-	    (interrupter.pw * 1000) / interrupter.prd; // gives duty cycle as 0.1% increment
+		(interrupter.pw * 1000) / interrupter.prd; // gives duty cycle as 0.1% increment
 	total_duty = interrupter.duty;
 	if (total_duty > confparam[CONF_MAX_TR_DUTY].value) {
 		new_duty = (confparam[CONF_MAX_TR_DUTY].value * interrupter.duty) / total_duty;

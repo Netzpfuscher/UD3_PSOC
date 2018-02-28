@@ -36,12 +36,11 @@ uint32 charging_counter;
 void initialize_charging(void) {
 	telemetry.bus_status = BUS_OFF;
 	if ((confparam[CONF_PS_SCHEME].value == BAT_BOOST_BUS_SCHEME) ||
-	    (confparam[CONF_PS_SCHEME].value == AC_OR_BATBOOST_SCHEME)) {
+		(confparam[CONF_PS_SCHEME].value == AC_OR_BATBOOST_SCHEME)) {
 		SLR_Control = 0;
 		SLRPWM_Start();
 		if (confparam[CONF_SLR_FSWITCH].value == 0) {
-			confparam[CONF_SLR_FSWITCH].value =
-			    500; // just in case it wasnt ever programmed
+			confparam[CONF_SLR_FSWITCH].value = 500; // just in case it wasnt ever programmed
 			// store_setting(SET_SLR_FSWITCH, config.SLR_Fswitch);
 		}
 		uint16 x;
@@ -58,7 +57,7 @@ void initialize_charging(void) {
 char buf[100];
 
 void control_precharge(
-    void) { // this gets called from analogs.c when the ADC data set is ready, 8khz rep rate
+	void) { // this gets called from analogs.c when the ADC data set is ready, 8khz rep rate
 	uint32 v_threshold;
 	static uint8_t cnt = 0;
 
@@ -87,8 +86,7 @@ void control_precharge(
 		else if (confparam[CONF_PS_SCHEME].value == BAT_BOOST_BUS_SCHEME) {
 			if (telemetry.bus_v < (confparam[CONF_SLR_VBUS].value - 15)) {
 				SLR_Control = 1;
-				telemetry.bus_status =
-				    BUS_READY; // its OK to operate the TC when charging from SLR
+				telemetry.bus_status = BUS_READY; // its OK to operate the TC when charging from SLR
 			} else if (telemetry.bus_v > confparam[CONF_SLR_VBUS].value) {
 				SLR_Control = 0;
 				telemetry.bus_status = BUS_READY;
@@ -143,8 +141,7 @@ void control_precharge(
 				if (delta_vbus > 4)
 					confparam[CONF_PS_SCHEME].value = AC_PRECHARGE_BUS_SCHEME;
 				// if this fails, check, is there battery voltage?
-				else if (telemetry.batt_v >=
-					 (confparam[CONF_BATT_LOCKOUT_V].value - 1)) {
+				else if (telemetry.batt_v >= (confparam[CONF_BATT_LOCKOUT_V].value - 1)) {
 					confparam[CONF_PS_SCHEME].value = BAT_BOOST_BUS_SCHEME;
 					relay_Write(RELAY_OFF);
 				} else

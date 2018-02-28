@@ -42,10 +42,10 @@ void vMainTask(void *pvParameters);
 
 int main() {
 	system_fault_Control =
-	    0; // this should suppress any start-up sparking until the system is ready
+		0; // this should suppress any start-up sparking until the system is ready
 	EEPROM_1_Start();
 	eprom_load();
-	initialize_DMA();	 // sets up all DMA channels
+	initialize_DMA();		  // sets up all DMA channels
 	initialize_interrupter(); // initializes hardware related to the interrupter
 	initialize_ZCD_to_PWM();  // initializes hardware related to ZCD to PWM
 	initialize_charging();
@@ -65,10 +65,10 @@ int main() {
 	tsk_uart_Start(); // Handles UART-Hardware and queues
 	tsk_usb_Start();  // Handles USB-Hardware and queues
 	tsk_midi_Start();
-	cli_Start();		// Commandline interface
-	tsk_analog_Start();     // Reads bus voltage and currents
+	cli_Start();			// Commandline interface
+	tsk_analog_Start();		// Reads bus voltage and currents
 	tsk_thermistor_Start(); // Reads thermistors
-	tsk_fault_Start();      // Handles fault conditions
+	tsk_fault_Start();		// Handles fault conditions
 
 	FreeRTOS_Start();
 

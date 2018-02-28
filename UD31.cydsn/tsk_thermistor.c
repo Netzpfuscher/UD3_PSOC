@@ -74,9 +74,9 @@ uint16_t temp_fault_counter;
 
 // temperature *128
 const uint16 count_temp_table[] = {15508, 10939, 8859, 7536, 6579, 5826, 5220, 4715,
-				   4275,  3879,  3551, 3229, 2965, 2706, 2469, 2261,
-				   2054,  1861,  1695, 1530, 1364, 1215, 1084, 953,
-				   822,   690,   576,  473,  369,  266,  163,  59};
+								   4275,  3879,  3551, 3229, 2965, 2706, 2469, 2261,
+								   2054,  1861,  1695, 1530, 1364, 1215, 1084, 953,
+								   822,   690,   576,  473,  369,  266,  163,  59};
 
 /* `#END` */
 /* ------------------------------------------------------------------------ */
@@ -100,13 +100,12 @@ void initialize_thermistor(void) {
 	/* Move these variable declarations to the top of the function */
 	uint8 therm_dma_Chan;
 	uint8 therm_dma_TD[1];
-	therm_dma_Chan =
-	    therm_dma_DmaInitialize(therm_dma_BYTES_PER_BURST, therm_dma_REQUEST_PER_BURST,
-				    HI16(therm_dma_SRC_BASE), HI16(therm_dma_DST_BASE));
+	therm_dma_Chan = therm_dma_DmaInitialize(therm_dma_BYTES_PER_BURST, therm_dma_REQUEST_PER_BURST,
+											 HI16(therm_dma_SRC_BASE), HI16(therm_dma_DST_BASE));
 	therm_dma_TD[0] = CyDmaTdAllocate();
 	CyDmaTdSetConfiguration(therm_dma_TD[0], 4, therm_dma_TD[0], TD_INC_DST_ADR);
 	CyDmaTdSetAddress(therm_dma_TD[0], LO16((uint32)ADC_therm_SAR_WRK0_PTR),
-			  LO16((uint32)therm_sample));
+					  LO16((uint32)therm_sample));
 	CyDmaChSetInitialTd(therm_dma_Chan, therm_dma_TD[0]);
 	CyDmaChEnable(therm_dma_Chan, 1);
 }
@@ -120,16 +119,14 @@ uint16_t get_temp_128(uint16_t counts) {
 	counts_div--;
 	if (counts > counts_window) {
 		return count_temp_table[counts_div] -
-		       (((uint32_t)(count_temp_table[counts_div] -
-				    count_temp_table[counts_div + 1]) *
-			 ((uint32_t)counts - counts_window)) /
-			128);
+			   (((uint32_t)(count_temp_table[counts_div] - count_temp_table[counts_div + 1]) *
+				 ((uint32_t)counts - counts_window)) /
+				128);
 	} else {
 		return count_temp_table[counts_div] -
-		       (((uint32_t)(count_temp_table[counts_div - 1] -
-				    count_temp_table[counts_div]) *
-			 ((uint32_t)counts - counts_window)) /
-			128);
+			   (((uint32_t)(count_temp_table[counts_div - 1] - count_temp_table[counts_div]) *
+				 ((uint32_t)counts - counts_window)) /
+				128);
 	}
 }
 
@@ -221,7 +218,7 @@ void tsk_thermistor_Start(void) {
 		* will call the task procedure and start execution of the task.
 		*/
 		xTaskCreate(tsk_thermistor_TaskProc, "Therm", 512, NULL, PRIO_THERMISTOR,
-			    &tsk_thermistor_TaskHandle);
+					&tsk_thermistor_TaskHandle);
 		tsk_thermistor_initVar = 1;
 	}
 }

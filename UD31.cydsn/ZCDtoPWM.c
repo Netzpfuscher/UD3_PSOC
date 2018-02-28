@@ -61,27 +61,27 @@ void configure_CT1(void) {
 	float min_tr_cl_dac_val_temp;
 
 	// figure out the CT setups
-	max_tr_cl_dac_val_temp = (((float)confparam[CONF_MAX_TR_CURRENT].value /
-				   (float)confparam[CONF_CT1_RATIO].value) *
-				  confparam[CONF_CT1_BURDEN].value) /
-				 (DAC_VOLTS_PER_STEP * 10);
+	max_tr_cl_dac_val_temp =
+		(((float)confparam[CONF_MAX_TR_CURRENT].value / (float)confparam[CONF_CT1_RATIO].value) *
+		 confparam[CONF_CT1_BURDEN].value) /
+		(DAC_VOLTS_PER_STEP * 10);
 	if (max_tr_cl_dac_val_temp > 255) {
 		max_tr_cl_dac_val_temp = 255;
 	}
 	params.max_tr_cl_dac_val = round(max_tr_cl_dac_val_temp);
-	max_qcw_cl_dac_val_temp = (((float)confparam[CONF_MAX_QCW_CURRENT].value /
-				    (float)confparam[CONF_CT1_RATIO].value) *
-				   confparam[CONF_CT1_BURDEN].value) /
-				  (DAC_VOLTS_PER_STEP * 10);
+	max_qcw_cl_dac_val_temp =
+		(((float)confparam[CONF_MAX_QCW_CURRENT].value / (float)confparam[CONF_CT1_RATIO].value) *
+		 confparam[CONF_CT1_BURDEN].value) /
+		(DAC_VOLTS_PER_STEP * 10);
 	if (max_qcw_cl_dac_val_temp > 255) {
 		max_qcw_cl_dac_val_temp = 255;
 	}
 
 	params.max_qcw_cl_dac_val = round(max_qcw_cl_dac_val_temp);
-	min_tr_cl_dac_val_temp = (((float)confparam[CONF_MIN_TR_CURRENT].value /
-				   (float)confparam[CONF_CT1_RATIO].value) *
-				  confparam[CONF_CT1_BURDEN].value) /
-				 (DAC_VOLTS_PER_STEP * 10);
+	min_tr_cl_dac_val_temp =
+		(((float)confparam[CONF_MIN_TR_CURRENT].value / (float)confparam[CONF_CT1_RATIO].value) *
+		 confparam[CONF_CT1_BURDEN].value) /
+		(DAC_VOLTS_PER_STEP * 10);
 	if (min_tr_cl_dac_val_temp > 255) {
 		min_tr_cl_dac_val_temp = 255;
 	}
@@ -96,13 +96,13 @@ void configure_CT1(void) {
 
 void configure_CT2(void) {
 	// DC CT full scale
-	params.Idc_fs = (50 * (float)confparam[CONF_CT2_RATIO].value) /
-			(confparam[CONF_CT2_BURDEN].value * 4096);
+	params.Idc_fs =
+		(50 * (float)confparam[CONF_CT2_RATIO].value) / (confparam[CONF_CT2_BURDEN].value * 4096);
 
 	// DC CT mA_Count
 	params.idc_ma_count = (uint32_t)((confparam[CONF_CT2_RATIO].value * 50 * 1000) /
-					 confparam[CONF_CT2_BURDEN].value) /
-			      4096;
+									 confparam[CONF_CT2_BURDEN].value) /
+						  4096;
 }
 
 void configure_ZCD_to_PWM(void) {
@@ -130,21 +130,21 @@ void configure_ZCD_to_PWM(void) {
 
 	// calculate starting period
 	pwm_start_prd_temp = CPU_CLK_FREQ / (confparam[CONF_START_FREQ].value *
-					     200); // why 200? well 2 because its half-periods, and
-						   // 100 because frequency is in hz*100
+										 200); // why 200? well 2 because its half-periods, and
+											   // 100 because frequency is in hz*100
 	params.pwm_top = round(pwm_start_prd_temp *
-			       2); // top value for FB capture and pwm generators to avoid ULF crap
+						   2); // top value for FB capture and pwm generators to avoid ULF crap
 	params.pwma_start_prd = params.pwm_top - params.lead_time;
 	params.pwma_start_cmp = params.pwm_top - pwm_start_prd_temp + 4; // untested, was just 4;
 	params.pwma_run_prd = params.pwm_top - params.lead_time;
 	params.pwmb_start_prd = round(pwm_start_prd_temp); // experimental start up mode, 2 cycles
-							   // of high frequency to start things up
-							   // but stay ahead of the game.
+													   // of high frequency to start things up
+													   // but stay ahead of the game.
 	params.pwmb_start_cmp = 4;
 	params.pwmb_start_psb_val = 15; // config.psb_start_val;// params.pwmb_start_prd>>3;
 	// Set up FB_GLITCH PWM
 	params.fb_glitch_cmp =
-	    pwm_start_prd_temp / 4; // set the lock out period to be 1/4 of a cycle long
+		pwm_start_prd_temp / 4; // set the lock out period to be 1/4 of a cycle long
 	if (params.fb_glitch_cmp > 255) {
 		params.fb_glitch_cmp = 255;
 	}

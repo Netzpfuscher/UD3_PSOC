@@ -70,7 +70,7 @@ void handle_UVLO(void) {
 	// UVLO feedback via system_fault (LED2)
 	telemetry.uvlo_stat = UVLO_status_Status;
 	if ((bus_command == BUS_COMMAND_FAULT) || (telemetry.uvlo_stat == 0) ||
-	    (telemetry.bus_status == BUS_CHARGING)) {
+		(telemetry.bus_status == BUS_CHARGING)) {
 		system_fault_Control = 0;
 	} else {
 		system_fault_Control = 1;
@@ -131,8 +131,7 @@ void tsk_fault_Start(void) {
 		* Create the task and then leave. When FreeRTOS starts up the scheduler
 		* will call the task procedure and start execution of the task.
 		*/
-		xTaskCreate(tsk_fault_TaskProc, "Fault-Svc", 128, NULL, PRIO_FAULT,
-			    &tsk_fault_TaskHandle);
+		xTaskCreate(tsk_fault_TaskProc, "Fault-Svc", 128, NULL, PRIO_FAULT, &tsk_fault_TaskHandle);
 		tsk_fault_initVar = 1;
 	}
 }

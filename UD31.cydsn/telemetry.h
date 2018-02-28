@@ -35,17 +35,17 @@
 #define BUS_BATT_UV_FLT 7
 
 typedef struct {
-	uint16 bus_v;       // in volts
-	uint16 batt_v;      // in volts
+	uint16 bus_v;		// in volts
+	uint16 batt_v;		// in volts
 	uint16 aux_batt_v;  // not used
-	uint8 temp1;	// in *C
-	uint8 temp2;	// in *C
-	uint8 temp3;	// not used
+	uint8 temp1;		// in *C
+	uint8 temp2;		// in *C
+	uint8 temp3;		// not used
 	uint8 bus_status;   // 0 = charging, 1 = ready
 	uint16 avg_power;   // Average power in watts
 	uint16 bang_energy; // bang energy in joules
-	uint16 batt_i;      // battery current in centiamps
-	uint8 uvlo_stat;    // uvlo status
+	uint16 batt_i;		// battery current in centiamps
+	uint8 uvlo_stat;	// uvlo status
 	uint16_t primary_i;
 } telemetry_struct;
 telemetry_struct telemetry;

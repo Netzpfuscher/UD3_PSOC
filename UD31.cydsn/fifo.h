@@ -3,10 +3,10 @@
 #include <stdint.h>
 
 typedef struct {
-	uint8_t volatile count;      // # Zeichen im Puffer
-	uint8_t size;		     // Puffer-Größe
-	uint8_t *pread;		     // Lesezeiger
-	uint8_t *pwrite;	     // Schreibzeiger
+	uint8_t volatile count;		 // # Zeichen im Puffer
+	uint8_t size;				 // Puffer-Größe
+	uint8_t *pread;				 // Lesezeiger
+	uint8_t *pwrite;			 // Schreibzeiger
 	uint8_t read2end, write2end; // # Zeichen bis zum Überlauf Lese-/Schreibzeiger
 } fifo_t;
 

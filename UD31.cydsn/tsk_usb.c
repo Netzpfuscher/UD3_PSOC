@@ -98,10 +98,9 @@ void tsk_usb_Task(void *pvParameters) {
 	for (;;) {
 		/* Handle enumeration of USB port */
 		if (USBMIDI_1_IsConfigurationChanged() !=
-		    0u) /* Host could send double SET_INTERFACE request */
+			0u) /* Host could send double SET_INTERFACE request */
 		{
-			if (USBMIDI_1_GetConfiguration() !=
-			    0u) /* Init IN endpoints when device configured */
+			if (USBMIDI_1_GetConfiguration() != 0u) /* Init IN endpoints when device configured */
 			{
 				/* Enumeration is done, enable OUT endpoint for receive data from
 				 * Host */
@@ -161,8 +160,7 @@ void tsk_usb_Task(void *pvParameters) {
 					while (USBMIDI_1_CDCIsReady() == 0u) {
 						vTaskDelay(10 / portTICK_RATE_MS);
 					}
-					USBMIDI_1_PutData(NULL,
-							  0u); /* Send zero-length packet to PC */
+					USBMIDI_1_PutData(NULL, 0u); /* Send zero-length packet to PC */
 				}
 			}
 		}

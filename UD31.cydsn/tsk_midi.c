@@ -96,24 +96,24 @@ typedef struct __note__ {
 
 typedef struct __midich__ {
 	uint8 expression; // Expression: Control change (Bxh) 0 bH
-	uint8 rpn_lsb;    // RPN (LSB): Control change (Bxh) 64 H
-	uint8 rpn_msb;    // RPN (MSB): Control change (Bxh) 65 H
+	uint8 rpn_lsb;	// RPN (LSB): Control change (Bxh) 64 H
+	uint8 rpn_msb;	// RPN (MSB): Control change (Bxh) 65 H
 	uint8 bendrange;  // Pitch Bend Sensitivity (0 - ffh)
 	int16 pitchbend;  // Pitch Bend (0-3fffh)
-	uint8 updated;    // Was it updated (whether BentRange or PitchBent was rewritten)
+	uint8 updated;	// Was it updated (whether BentRange or PitchBent was rewritten)
 } MIDICH;
 
 typedef struct __channel__ {
-	uint8 midich;    // Channel of midi (0 - 15)
+	uint8 midich;	// Channel of midi (0 - 15)
 	uint8 miditone;  // Midi's tone number (0-127)
-	uint8 volume;    // Volume (0 - 127) Not immediately reflected in port
+	uint8 volume;	// Volume (0 - 127) Not immediately reflected in port
 	uint8 updated;   // Was it updated?
 	uint8 displayed; // Displayed 0 ... Displayed, 1 ... Note On, 2 ... Note Off
 } CHANNEL;
 
 typedef struct __port__ {
 	uint16 halfcount; // A count that determines the frequency of port (for 1/2 period)
-	uint8 volume;     // Volume of port (0 - 127)
+	uint8 volume;	 // Volume of port (0 - 127)
 } PORT;
 
 PORT *isr_port_ptr;
@@ -224,8 +224,7 @@ void USBMIDI_1_callbackLocalMidiEvent(uint8 cable, uint8 *midiMsg) {
 			xQueueSendFromISR(qMIDI_rx, &note_struct, NULL);
 			break;
 		case 0xb0:
-			v_NOTE_CONTROLCHANGE(&note_struct, midiMsg[0] & 0x0f, midiMsg[1],
-					     midiMsg[2]);
+			v_NOTE_CONTROLCHANGE(&note_struct, midiMsg[0] & 0x0f, midiMsg[1], midiMsg[2]);
 			xQueueSendFromISR(qMIDI_rx, &note_struct, NULL);
 			break;
 		case 0xe0:
@@ -276,7 +275,7 @@ void MidichInit(MIDICH ptr[]) {
 		// Data entry (MSB): Control change (Bxh) 05 H xx
 		// Update Pitch Bend Sensitivity
 		ptr[cnt].bendrange = 2; // Pitch Bend Sensitivity (0 - ffh)
-					// Update pitch bend with Exh LSB MSB
+								// Update pitch bend with Exh LSB MSB
 		ptr[cnt].pitchbend = 0; // Pitch Bend (-8192 - 8191)
 		ptr[cnt].updated = 0;
 	}
@@ -284,13 +283,13 @@ void MidichInit(MIDICH ptr[]) {
 
 void process(NOTE *v, CHANNEL channel[], MIDICH midich[]) {
 	uint8_t ch;
-	if (v->command == COMMAND_NOTEONOFF) {   // Processing of note on / off
-		if (v->data.noteonoff.vol > 0) { // Note ON
+	if (v->command == COMMAND_NOTEONOFF) { // Processing of note on / off
+		if (v->data.noteonoff.vol > 0) {   // Note ON
 			for (ch = 0; ch < N_CHANNEL;
-			     ch++) { // Search for ports that are already ringing with the same MIDI
-				     // channel & node number
+				 ch++) { // Search for ports that are already ringing with the same MIDI
+						 // channel & node number
 				if (channel[ch].volume > 0 && channel[ch].midich == v->midich &&
-				    channel[ch].miditone == v->data.noteonoff.tone)
+					channel[ch].miditone == v->data.noteonoff.tone)
 					break;
 			}
 			if (ch == N_CHANNEL) { // When there is no already-sounding port
@@ -310,10 +309,10 @@ void process(NOTE *v, CHANNEL channel[], MIDICH midich[]) {
 			}
 		} else { // Note OFF
 			for (ch = 0; ch < N_CHANNEL;
-			     ch++) { // Search for ports that are already ringing with the same MIDI
-				     // channel & node number
+				 ch++) { // Search for ports that are already ringing with the same MIDI
+						 // channel & node number
 				if (channel[ch].volume > 0 && channel[ch].midich == v->midich &&
-				    channel[ch].miditone == v->data.noteonoff.tone)
+					channel[ch].miditone == v->data.noteonoff.tone)
 					break;
 			}
 			if (ch < N_CHANNEL) { // A port was found
@@ -349,10 +348,8 @@ void process(NOTE *v, CHANNEL channel[], MIDICH midich[]) {
 				midich[v->midich].bendrange = v->data.controlchange.value;
 				midich[v->midich].updated = 1; // This MIDI channel has been updated
 				// Once accepted RPN reset
-				midich[v->midich].rpn_lsb =
-				    127; // RPN (LSB): Control change (Bxh) 64 H
-				midich[v->midich].rpn_msb =
-				    127; // RPN (MSB): Control change (Bxh) 65 H
+				midich[v->midich].rpn_lsb = 127; // RPN (LSB): Control change (Bxh) 64 H
+				midich[v->midich].rpn_msb = 127; // RPN (MSB): Control change (Bxh) 65 H
 			}
 			break;
 		case 0x77: // Panic Message
@@ -388,14 +385,13 @@ void reflect(PORT port[], CHANNEL channel[], MIDICH midich[]) {
 		if (channel[ch].updated || midich[mch].updated) {
 			if (channel[ch].volume > 0) {
 				port[ch].halfcount = FREQ_HALFCOUNT(MIDITONENUM_FREQ(
-				    channel[ch].miditone +
-				    ((float)midich[mch].pitchbend * midich[mch].bendrange) /
-					PITCHBEND_DIVIDER));
+					channel[ch].miditone +
+					((float)midich[mch].pitchbend * midich[mch].bendrange) / PITCHBEND_DIVIDER));
 				if (ch < N_DISPCHANNEL)
 					channel[ch].displayed = 1; // Re-display required
 			}
-			port[ch].volume = (int32)channel[ch].volume * midich[mch].expression /
-					  127;   // Reflect Expression here
+			port[ch].volume =
+				(int32)channel[ch].volume * midich[mch].expression / 127; // Reflect Expression here
 			channel[ch].updated = 0; // Mission channel update work done
 		}
 	}
@@ -498,8 +494,7 @@ void tsk_midi_Start(void) {
 		* Create the task and then leave. When FreeRTOS starts up the scheduler
 		* will call the task procedure and start execution of the task.
 		*/
-		xTaskCreate(tsk_midi_TaskProc, "MIDI-Svc", 1024, NULL, PRIO_MIDI,
-			    &tsk_midi_TaskHandle);
+		xTaskCreate(tsk_midi_TaskProc, "MIDI-Svc", 1024, NULL, PRIO_MIDI, &tsk_midi_TaskHandle);
 		tsk_midi_initVar = 1;
 	}
 }

@@ -55,8 +55,8 @@ xSemaphoreHandle USB_Terminal_Mutex;
 #include <project.h>
 
 #define UNUSED_VARIABLE(N)                                                                         \
-	do {                                                                                       \
-		(void)(N);                                                                         \
+	do {                                                                                           \
+		(void)(N);                                                                                 \
 	} while (0)
 void *extobjt = 0;
 
@@ -270,9 +270,9 @@ void cli_Start(void) {
 		* will call the task procedure and start execution of the task.
 		*/
 		xTaskCreate(tsk_cli_TaskProc, "UART-CLI", 1024, (void *)SERIAL, PRIO_TERMINAL,
-			    &UART_Terminal_TaskHandle);
+					&UART_Terminal_TaskHandle);
 		xTaskCreate(tsk_cli_TaskProc, "USB-CLI", 1024, (void *)USB, PRIO_TERMINAL,
-			    &USB_Terminal_TaskHandle);
+					&USB_Terminal_TaskHandle);
 		tsk_cli_initVar = 1;
 	}
 }

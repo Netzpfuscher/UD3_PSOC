@@ -25,8 +25,8 @@
 #ifndef ZCDTOPWM_H
 #define ZCDTOPWM_H
 
-#include <device.h>    
-    
+#include <device.h>
+
 #define CPU_CLK_PERIOD 15.6325
 #define CPU_CLK_FREQ 64000000
 #define DAC_VOLTS_PER_STEP 0.016

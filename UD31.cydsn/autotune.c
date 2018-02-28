@@ -37,7 +37,7 @@
 #define CURR 1
 
 void run_adc_sweep(uint16_t F_min, uint16_t F_max, uint16_t pulsewidth, uint8_t channel,
-		   uint8_t delay, uint8_t port) {
+				   uint8_t delay, uint8_t port) {
 
 	CT_MUX_Select(channel);
 	// units for frequency are 0.1kHz (so 1000 = 100khz).  Pulsewidth in uS
@@ -86,9 +86,9 @@ void run_adc_sweep(uint16_t F_min, uint16_t F_max, uint16_t pulsewidth, uint8_t 
 			current_buffer += CT1_Get_Current_f(channel);
 		}
 		freq_response[f][CURR] =
-		    round(current_buffer / (float)confparam[CONF_AUTOTUNE_SAMPLES].value * 10);
+			round(current_buffer / (float)confparam[CONF_AUTOTUNE_SAMPLES].value * 10);
 		sprintf(buffer, "Frequency: %i00Hz Current: %4i,%iA     \r", freq_response[f][FREQ],
-			freq_response[f][CURR] / 10, freq_response[f][CURR] % 10);
+				freq_response[f][CURR] / 10, freq_response[f][CURR] % 10);
 		send_string(buffer, port);
 	}
 	send_string("\r\n", port);
@@ -125,9 +125,8 @@ void run_adc_sweep(uint16_t F_min, uint16_t F_max, uint16_t pulsewidth, uint8_t 
 	for (f = 1; f < 128; f++) {
 		// braille_setPixel(f,((PIX_HEIGHT-1)-((PIX_HEIGHT-1)*freq_response[f][CURR])/max_curr));
 		braille_line(
-		    f - 1,
-		    ((PIX_HEIGHT - 1) - ((PIX_HEIGHT - 1) * freq_response[f - 1][CURR]) / max_curr),
-		    f, ((PIX_HEIGHT - 1) - ((PIX_HEIGHT - 1) * freq_response[f][CURR]) / max_curr));
+			f - 1, ((PIX_HEIGHT - 1) - ((PIX_HEIGHT - 1) * freq_response[f - 1][CURR]) / max_curr),
+			f, ((PIX_HEIGHT - 1) - ((PIX_HEIGHT - 1) * freq_response[f][CURR]) / max_curr));
 	}
 	braille_draw(port);
 	for (f = 0; f < PIX_WIDTH / 2; f += 4) {
