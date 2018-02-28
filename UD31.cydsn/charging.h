@@ -25,6 +25,8 @@
 #ifndef CHARGING_H
 #define CHARGING_H
 
+#include <device.h>
+    
 #define LOW_BATTERY_TIMEOUT 20000 // 8khz ticks, 40000 = 5sec
 #define CHARGE_TEST_TIMEOUT 80000 // 10 sec
 #define AC_PRECHARGE_TIMEOUT 100  //
