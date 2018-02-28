@@ -79,6 +79,5 @@
 #define TR1_CL_DMA_SRC_BASE (CYDEV_SRAM_BASE)
 #define TR1_CL_DMA_DST_BASE (CYDEV_PERIPH_BASE)
 
-
-void initialize_DMA (void);
-#endif 
+void initialize_DMA(void);
+#endif

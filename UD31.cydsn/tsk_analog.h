@@ -21,9 +21,9 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
- 
+
 #if !defined(tsk_analog_TASK_H)
-	#define tsk_analog_TASK_H
+#define tsk_analog_TASK_H
 
 /*
  * Add user task definitions, types, includes and other things in the below
@@ -31,14 +31,13 @@
  */
 /* `#START USER_TYPES_AND_DEFINES` */
 #include <device.h>
-    
-    
+
 #define CT_PRIMARY 0
 #define CT_SECONDARY 1
-    
+
 /* `#END` */
-	
-void tsk_analog_Start( void );
+
+void tsk_analog_Start(void);
 uint16_t CT1_Get_Current(uint8_t channel);
 float CT1_Get_Current_f(uint8_t channel);
 

@@ -21,9 +21,9 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
- 
+
 #if !defined(overlay_TASK_H)
-	#define overlay_TASK_H
+#define overlay_TASK_H
 
 /*
  * Add user task definitions, types, includes and other things in the below
@@ -32,9 +32,8 @@
 /* `#START USER_TYPES_AND_DEFINES` */
 
 /* `#END` */
-	
-void tsk_overlay_TaskProc( void *pvParameters );
 
+void tsk_overlay_TaskProc(void *pvParameters);
 
 /*
  * Add user function prototypes in the below merge region to add user
