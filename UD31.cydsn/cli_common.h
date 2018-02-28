@@ -1,12 +1,28 @@
 /*
- * Copyright (c) 2014 Steve Ward
+ * UD3
+ *
  * Copyright (c) 2018 Jens Kerrinnes
- * LICENCE: MIT License (look at /LICENCE.md)
- */
-
+ * Copyright (c) 2015 Steve Ward
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to
+ * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ * the Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
 
 #include <device.h>
-
 
 struct parameter_entry_struct {
 	const char *name;
@@ -14,7 +30,7 @@ struct parameter_entry_struct {
 	uint16_t min;
 	uint16_t max;
 	uint8_t (*updateFunction)(int newValue, uint8_t index);
-    const char *help;
+	const char *help;
 };
 
 typedef struct parameter_entry_struct parameter_entry;
@@ -60,21 +76,18 @@ typedef struct parameter_entry_struct parameter_entry;
 #define MODE_CLASSIC 1
 #define MODE_UDCLASSIC 2
 
-#define fan_controller          1   //enables fan controller
-#define auto_charge_bus         0   //enables auto charging of DC bus on start up (no wait for command)
-#define auto_charge_battery     0
-#define ext_trig_runs_CW        0   //special test mode where holding the trigger runs the coil in CW mode
-
-
+#define fan_controller 1  // enables fan controller
+#define auto_charge_bus 0 // enables auto charging of DC bus on start up (no wait for command)
+#define auto_charge_battery 0
+#define ext_trig_runs_CW 0 // special test mode where holding the trigger runs the coil in CW mode
 
 #define SERIAL 0
 #define USB 1
 
-
 uint8_t input_handle();
 void input_interpret(uint8_t port);
 void input_restart(void);
-void Term_Move_Cursor(uint8_t row, uint8_t column,uint8_t port);
+void Term_Move_Cursor(uint8_t row, uint8_t column, uint8_t port);
 void Term_Erase_Screen(uint8_t port);
 void Term_Color_Green(uint8_t port);
 void Term_Color_Red(uint8_t port);
@@ -83,10 +96,10 @@ void Term_Color_Cyan(uint8_t port);
 void Term_BGColor_Blue(uint8_t port);
 void Term_Save_Cursor(uint8_t port);
 void Term_Restore_Cursor(uint8_t port);
-void Term_Box(uint8_t row1, uint8_t col1, uint8_t row2, uint8_t col2,uint8_t port);
+void Term_Box(uint8_t row1, uint8_t col1, uint8_t row2, uint8_t col2, uint8_t port);
 void send_char(uint8_t c, uint8_t port);
-void send_string(char * data, uint8_t port);
-void send_buffer(uint8_t * data,uint16_t len, uint8_t port);
+void send_string(char *data, uint8_t port);
+void send_buffer(uint8_t *data, uint16_t len, uint8_t port);
 uint8_t term_config_changed(void);
 void nt_interpret(const char *text, uint8_t port);
 uint8_t eprom_load(void);
@@ -94,7 +107,7 @@ uint8_t eprom_load(void);
 void initialize_term(void);
 void task_terminal_overlay(void);
 
-///Help
+/// Help
 void task_terminal();
 
 extern volatile parameter_entry tparameters[];
@@ -102,4 +115,3 @@ volatile uint8_t qcw_reg;
 extern parameter_entry confparam[];
 
 xSemaphoreHandle block_term[2];
-
