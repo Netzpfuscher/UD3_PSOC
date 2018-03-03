@@ -62,7 +62,7 @@ void show_overlay(uint8_t port) {
 
 	uint8_t row_pos = 1;
 	uint8_t col_pos = 90;
-	// Term_Erase_Screen(port);
+	//Term_Erase_Screen(port);
 	Term_Box(row_pos, col_pos, row_pos + 9, col_pos + 25, port);
 	Term_Move_Cursor(row_pos + 1, col_pos + 1, port);
 	sprintf(buffer, "Bus Voltage:       %4iV", telemetry.bus_v);

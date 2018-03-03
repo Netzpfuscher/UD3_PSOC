@@ -79,7 +79,8 @@ xSemaphoreHandle tsk_analog_Mutex;
 
 #define INITIAL 0 /* Initial value of the filter memory. */
 
-typedef struct {
+typedef struct
+{
 	uint16_t rms;
 	uint64_t sum_squares;
 } rms_t;
@@ -119,13 +120,9 @@ uint16_t CT1_Get_Current(uint8_t channel) {
 	uint32_t result = ADC_DelSig_1_GetResult32();
 
 	if (channel == CT_PRIMARY) {
-		return ((ADC_DelSig_1_CountsTo_mVolts(result) * confparam[CONF_CT1_RATIO].value) /
-				confparam[CONF_CT1_BURDEN].value) /
-			   100;
+		return ((ADC_DelSig_1_CountsTo_mVolts(result) * confparam[CONF_CT1_RATIO].value) / confparam[CONF_CT1_BURDEN].value) / 100;
 	} else {
-		return ((ADC_DelSig_1_CountsTo_mVolts(result) * confparam[CONF_CT3_RATIO].value) /
-				confparam[CONF_CT3_BURDEN].value) /
-			   100;
+		return ((ADC_DelSig_1_CountsTo_mVolts(result) * confparam[CONF_CT3_RATIO].value) / confparam[CONF_CT3_BURDEN].value) / 100;
 	}
 }
 
@@ -133,11 +130,9 @@ float CT1_Get_Current_f(uint8_t channel) {
 	uint32_t result = ADC_DelSig_1_GetResult32();
 
 	if (channel == CT_PRIMARY) {
-		return ((float)(ADC_DelSig_1_CountsTo_Volts(result) * 10) /
-				(float)(confparam[CONF_CT1_BURDEN].value) * confparam[CONF_CT1_RATIO].value);
+		return ((float)(ADC_DelSig_1_CountsTo_Volts(result) * 10) / (float)(confparam[CONF_CT1_BURDEN].value) * confparam[CONF_CT1_RATIO].value);
 	} else {
-		return ((float)(ADC_DelSig_1_CountsTo_Volts(result) * 10) /
-				(float)(confparam[CONF_CT3_BURDEN].value) * confparam[CONF_CT3_RATIO].value);
+		return ((float)(ADC_DelSig_1_CountsTo_Volts(result) * 10) / (float)(confparam[CONF_CT3_BURDEN].value) * confparam[CONF_CT3_RATIO].value);
 	}
 }
 
@@ -180,9 +175,7 @@ void calculate_rms(void) {
 
 		// read the battery current
 
-		telemetry.batt_i =
-			(((uint32_t)rms_filter(&current_idc, ADC_sample[DATA_IBUS]) * params.idc_ma_count) /
-			 100);
+		telemetry.batt_i = (((uint32_t)rms_filter(&current_idc, ADC_sample[DATA_IBUS]) * params.idc_ma_count) / 100);
 
 		telemetry.avg_power = telemetry.batt_i * telemetry.bus_v / 10;
 	}
@@ -219,8 +212,7 @@ void initialize_analogs(void) {
 										 HI16(MUX_DMA_SRC_BASE), HI16(MUX_DMA_DST_BASE));
 	MUX_DMA_TD[0] = CyDmaTdAllocate();
 	CyDmaTdSetConfiguration(MUX_DMA_TD[0], 4, MUX_DMA_TD[0], CY_DMA_TD_INC_SRC_ADR);
-	CyDmaTdSetAddress(MUX_DMA_TD[0], LO16((uint32)ADC_mux_ctl),
-					  LO16((uint32)Amux_Ctrl_Control_PTR));
+	CyDmaTdSetAddress(MUX_DMA_TD[0], LO16((uint32)ADC_mux_ctl), LO16((uint32)Amux_Ctrl_Control_PTR));
 	CyDmaChSetInitialTd(MUX_DMA_Chan, MUX_DMA_TD[0]);
 	CyDmaChEnable(MUX_DMA_Chan, 1);
 
@@ -270,7 +262,7 @@ void tsk_analog_TaskProc(void *pvParameters) {
 
 		/* `#END` */
 
-		// vTaskDelay( 10/ portTICK_PERIOD_MS);
+		//vTaskDelay( 10/ portTICK_PERIOD_MS);
 	}
 }
 /* ------------------------------------------------------------------------ */
@@ -278,7 +270,7 @@ void tsk_analog_Start(void) {
 	/*
 	 * Insert task global memeory initialization here. Since the OS does not
 	 * initialize ANY global memory, execute the initialization here to make
-	 * sure that your task data is properly
+	 * sure that your task data is properly 
 	 */
 	/* `#START TASK_GLOBAL_INIT` */
 
@@ -290,9 +282,9 @@ void tsk_analog_Start(void) {
 #endif
 
 		/*
-		* Create the task and then leave. When FreeRTOS starts up the scheduler
-		* will call the task procedure and start execution of the task.
-		*/
+	 	* Create the task and then leave. When FreeRTOS starts up the scheduler
+	 	* will call the task procedure and start execution of the task.
+	 	*/
 		xTaskCreate(tsk_analog_TaskProc, "Analog", 512, NULL, PRIO_ANALOG, &tsk_analog_TaskHandle);
 		tsk_analog_initVar = 1;
 	}

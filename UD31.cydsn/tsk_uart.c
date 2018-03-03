@@ -135,9 +135,9 @@ void tsk_uart_TaskProc(void *pvParameters) {
 	char c;
 
 	/* `#END` */
-	// char buffer[30];
-	// uint16_t num;
-	// uint8_t cnt;
+	//char buffer[30];
+	//uint16_t num;
+	//uint8_t cnt;
 
 	for (;;) {
 		/* `#START TASK_LOOP_CODE` */
@@ -157,7 +157,7 @@ void tsk_uart_Start(void) {
 	/*
 	 * Insert task global memeory initialization here. Since the OS does not
 	 * initialize ANY global memory, execute the initialization here to make
-	 * sure that your task data is properly
+	 * sure that your task data is properly 
 	 */
 	/* `#START TASK_GLOBAL_INIT` */
 
@@ -169,9 +169,9 @@ void tsk_uart_Start(void) {
 #endif
 
 		/*
-		* Create the task and then leave. When FreeRTOS starts up the scheduler
-		* will call the task procedure and start execution of the task.
-		*/
+	 	* Create the task and then leave. When FreeRTOS starts up the scheduler
+	 	* will call the task procedure and start execution of the task.
+	 	*/
 		xTaskCreate(tsk_uart_TaskProc, "UART-Svc", 1024, NULL, PRIO_UART, &tsk_uart_TaskHandle);
 		tsk_uart_initVar = 1;
 	}

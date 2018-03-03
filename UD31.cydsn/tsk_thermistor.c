@@ -52,9 +52,9 @@ xSemaphoreHandle tsk_thermistor_Mutex;
 #define TEMP_INC 5
 #define RES_TABLE_SIZE 32
 
-#define RES_SHORT 270 // internal resistance to DAC
+#define RES_SHORT 270 //internal resistance to DAC
 #define THERM_DAC_VAL 23
-#define THERM_DAC_STEP 8 // micro amps
+#define THERM_DAC_STEP 8 //micro amps
 
 #define TEMP1_FAULT 0b0001
 #define TEMP2_FAULT 0b0010
@@ -72,11 +72,10 @@ xSemaphoreHandle tsk_thermistor_Mutex;
 uint16_t therm_sample[2];
 uint16_t temp_fault_counter;
 
-// temperature *128
-const uint16 count_temp_table[] = {15508, 10939, 8859, 7536, 6579, 5826, 5220, 4715,
-								   4275,  3879,  3551, 3229, 2965, 2706, 2469, 2261,
-								   2054,  1861,  1695, 1530, 1364, 1215, 1084, 953,
-								   822,   690,   576,  473,  369,  266,  163,  59};
+//temperature *128
+const uint16 count_temp_table[] = {
+	15508, 10939, 8859, 7536, 6579, 5826, 5220, 4715, 4275, 3879, 3551, 3229, 2965, 2706, 2469, 2261,
+	2054, 1861, 1695, 1530, 1364, 1215, 1084, 953, 822, 690, 576, 473, 369, 266, 163, 59};
 
 /* `#END` */
 /* ------------------------------------------------------------------------ */
@@ -91,7 +90,7 @@ void initialize_thermistor(void) {
 	IDAC_therm_Start();
 	ADC_therm_Start();
 	IDAC_therm_SetValue(THERM_DAC_VAL);
-	// this enables the thermistor conversion ISR
+	//this enables the thermistor conversion ISR
 	//    therm_sample_StartEx(therm_sample_ISR);
 
 	temp_fault_counter = 0;
@@ -104,8 +103,7 @@ void initialize_thermistor(void) {
 											 HI16(therm_dma_SRC_BASE), HI16(therm_dma_DST_BASE));
 	therm_dma_TD[0] = CyDmaTdAllocate();
 	CyDmaTdSetConfiguration(therm_dma_TD[0], 4, therm_dma_TD[0], TD_INC_DST_ADR);
-	CyDmaTdSetAddress(therm_dma_TD[0], LO16((uint32)ADC_therm_SAR_WRK0_PTR),
-					  LO16((uint32)therm_sample));
+	CyDmaTdSetAddress(therm_dma_TD[0], LO16((uint32)ADC_therm_SAR_WRK0_PTR), LO16((uint32)therm_sample));
 	CyDmaChSetInitialTd(therm_dma_Chan, therm_dma_TD[0]);
 	CyDmaChEnable(therm_dma_Chan, 1);
 }
@@ -118,21 +116,14 @@ uint16_t get_temp_128(uint16_t counts) {
 
 	counts_div--;
 	if (counts > counts_window) {
-		return count_temp_table[counts_div] -
-			   (((uint32_t)(count_temp_table[counts_div] - count_temp_table[counts_div + 1]) *
-				 ((uint32_t)counts - counts_window)) /
-				128);
+		return count_temp_table[counts_div] - (((uint32_t)(count_temp_table[counts_div] - count_temp_table[counts_div + 1]) * ((uint32_t)counts - counts_window)) / 128);
 	} else {
-		return count_temp_table[counts_div] -
-			   (((uint32_t)(count_temp_table[counts_div - 1] - count_temp_table[counts_div]) *
-				 ((uint32_t)counts - counts_window)) /
-				128);
+		return count_temp_table[counts_div] - (((uint32_t)(count_temp_table[counts_div - 1] - count_temp_table[counts_div]) * ((uint32_t)counts - counts_window)) / 128);
 	}
 }
 
 uint8 run_temp_check(void) {
-	// this function looks at all the thermistor temperatures, compares them against limits and
-	// returns any faults
+	//this function looks at all the thermistor temperatures, compares them against limits and returns any faults
 	uint8 fault = 0;
 	telemetry.temp1 = get_temp_128(therm_sample[0]) / 128;
 	telemetry.temp2 = get_temp_128(therm_sample[1]) / 128;
@@ -188,7 +179,7 @@ void tsk_thermistor_TaskProc(void *pvParameters) {
 				bus_command = BUS_COMMAND_FAULT;
 			}
 		} else {
-			// system_fault_Control = 1;
+			//system_fault_Control = 1;
 			temp_fault_counter = 0;
 		}
 
@@ -202,7 +193,7 @@ void tsk_thermistor_Start(void) {
 	/*
 	 * Insert task global memeory initialization here. Since the OS does not
 	 * initialize ANY global memory, execute the initialization here to make
-	 * sure that your task data is properly
+	 * sure that your task data is properly 
 	 */
 	/* `#START TASK_GLOBAL_INIT` */
 
@@ -214,11 +205,10 @@ void tsk_thermistor_Start(void) {
 #endif
 
 		/*
-		* Create the task and then leave. When FreeRTOS starts up the scheduler
-		* will call the task procedure and start execution of the task.
-		*/
-		xTaskCreate(tsk_thermistor_TaskProc, "Therm", 512, NULL, PRIO_THERMISTOR,
-					&tsk_thermistor_TaskHandle);
+	 	* Create the task and then leave. When FreeRTOS starts up the scheduler
+	 	* will call the task procedure and start execution of the task.
+	 	*/
+		xTaskCreate(tsk_thermistor_TaskProc, "Therm", 512, NULL, PRIO_THERMISTOR, &tsk_thermistor_TaskHandle);
 		tsk_thermistor_initVar = 1;
 	}
 }

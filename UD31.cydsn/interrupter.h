@@ -23,7 +23,7 @@
 */
 
 /*
-The internal_interrupter enables the ZCDtoPWM hardware.
+The internal_interrupter enables the ZCDtoPWM hardware.  
 Its a 16 bit PWM clocked at 1MHz, so thats 1uS per count.
 
 */
@@ -33,7 +33,7 @@ Its a 16 bit PWM clocked at 1MHz, so thats 1uS per count.
 #include <device.h>
 
 #define INTERRUPTER_CLK_FREQ 1000000
-#define WATCH_DOG_PERIOD 225 // mS
+#define WATCH_DOG_PERIOD 225 //mS
 
 /* DMA Configuration for int1_dma */
 #define int1_dma_BYTES_PER_BURST 8
@@ -41,7 +41,8 @@ Its a 16 bit PWM clocked at 1MHz, so thats 1uS per count.
 #define int1_dma_SRC_BASE (CYDEV_SRAM_BASE)
 #define int1_dma_DST_BASE (CYDEV_PERIPH_BASE)
 
-typedef struct {
+typedef struct
+{
 	uint16 pw;
 	uint16 duty_limited_pw;
 	uint16 prd;
@@ -50,7 +51,8 @@ typedef struct {
 
 interrupter_params interrupter;
 
-typedef struct {
+typedef struct
+{
 	uint16 modulation_value;
 	uint16 modulation_value_previous;
 	uint32 qcw_recorded_prd;
@@ -58,7 +60,7 @@ typedef struct {
 	uint16 shift_period;
 } ramp_params;
 
-ramp_params volatile ramp; // added volatile
+ramp_params volatile ramp; //added volatile
 
 extern volatile uint8 qcw_dl_ovf_counter;
 extern uint16 pw_override;

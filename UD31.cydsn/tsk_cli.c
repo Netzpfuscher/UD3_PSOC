@@ -54,9 +54,9 @@ xSemaphoreHandle USB_Terminal_Mutex;
 #include "tsk_usb.h"
 #include <project.h>
 
-#define UNUSED_VARIABLE(N)                                                                         \
-	do {                                                                                           \
-		(void)(N);                                                                                 \
+#define UNUSED_VARIABLE(N) \
+	do {                   \
+		(void)(N);         \
 	} while (0)
 void *extobjt = 0;
 
@@ -110,7 +110,7 @@ static int usb_read(char *buf, int cnt, void *extobj) {
 
 static int serial_write(const char *buf, int cnt, void *extobj) {
 	UNUSED_VARIABLE(extobj);
-	// UART_2_PutArray((uint8*)buf,cnt);
+	//UART_2_PutArray((uint8*)buf,cnt);
 
 	for (int i = 0; i < cnt; i++) {
 		xQueueSend(qUart_tx, &buf[i], portMAX_DELAY);
@@ -137,8 +137,8 @@ static int usb_write(const char *buf, int cnt, void *extobj) {
 static int serial_callback(const char *text, void *extobj) {
 	UNUSED_VARIABLE(extobj);
 	/*
-	 * This is a really simple example codes for the callback function.
-	 */
+     * This is a really simple example codes for the callback function.
+     */
 	nt_interpret(text, SERIAL);
 	return 0;
 }
@@ -146,8 +146,8 @@ static int serial_callback(const char *text, void *extobj) {
 static int usb_callback(const char *text, void *extobj) {
 	UNUSED_VARIABLE(extobj);
 	/*
-	 * This is a really simple example codes for the callback function.
-	 */
+     * This is a really simple example codes for the callback function.
+     */
 	nt_interpret(text, USB);
 	return 0;
 }
@@ -159,12 +159,12 @@ uint8_t handle_uart_terminal(ntshell_t *ptr) {
 		blink--;
 	if (blink == 1)
 		rx_blink_Control = 1;
-	// if(UART_2_GetRxBufferSize()==0) return 0;
+	//if(UART_2_GetRxBufferSize()==0) return 0;
 
 	if (xQueueReceive(qUart_rx, &c, portMAX_DELAY)) {
 		if (xSemaphoreTake(block_term[SERIAL], portMAX_DELAY)) {
 			;
-			// c = UART_2_GetChar();
+			//c = UART_2_GetChar();
 			rx_blink_Control = 0;
 			blink = 240;
 			ntshell_execute_nb(ptr, c);
@@ -184,10 +184,10 @@ uint8_t handle_USB_terminal(ntshell_t *ptr) {
 		blink--;
 	if (blink == 1)
 		rx_blink_Control = 1;
-	// if(UART_2_GetRxBufferSize()==0) return 0;
+	//if(UART_2_GetRxBufferSize()==0) return 0;
 	if (xQueueReceive(qUSB_rx, &c, portMAX_DELAY)) {
 		xSemaphoreTake(block_term[USB], portMAX_DELAY);
-		// c = UART_2_GetChar();
+		//c = UART_2_GetChar();
 		rx_blink_Control = 0;
 		blink = 240;
 		ntshell_execute_nb(ptr, c);
@@ -241,17 +241,17 @@ void tsk_cli_TaskProc(void *pvParameters) {
 
 		/* `#END` */
 
-		// vTaskDelay( 20/ portTICK_PERIOD_MS);
+		//vTaskDelay( 20/ portTICK_PERIOD_MS);
 	}
 	send_string("CLI-Task died", (uint32_t)pvParameters);
 }
 /* ------------------------------------------------------------------------ */
 void cli_Start(void) {
 /*
- * Insert task global memeory initialization here. Since the OS does not
- * initialize ANY global memory, execute the initialization here to make
- * sure that your task data is properly
- */
+	 * Insert task global memeory initialization here. Since the OS does not
+	 * initialize ANY global memory, execute the initialization here to make
+	 * sure that your task data is properly 
+	 */
 /* `#START TASK_GLOBAL_INIT` */
 
 /* `#END` */
@@ -266,13 +266,11 @@ void cli_Start(void) {
 #endif
 
 		/*
-		* Create the task and then leave. When FreeRTOS starts up the scheduler
-		* will call the task procedure and start execution of the task.
-		*/
-		xTaskCreate(tsk_cli_TaskProc, "UART-CLI", 1024, (void *)SERIAL, PRIO_TERMINAL,
-					&UART_Terminal_TaskHandle);
-		xTaskCreate(tsk_cli_TaskProc, "USB-CLI", 1024, (void *)USB, PRIO_TERMINAL,
-					&USB_Terminal_TaskHandle);
+	 	* Create the task and then leave. When FreeRTOS starts up the scheduler
+	 	* will call the task procedure and start execution of the task.
+	 	*/
+		xTaskCreate(tsk_cli_TaskProc, "UART-CLI", 1024, (void *)SERIAL, PRIO_TERMINAL, &UART_Terminal_TaskHandle);
+		xTaskCreate(tsk_cli_TaskProc, "USB-CLI", 1024, (void *)USB, PRIO_TERMINAL, &USB_Terminal_TaskHandle);
 		tsk_cli_initVar = 1;
 	}
 }

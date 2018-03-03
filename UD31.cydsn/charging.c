@@ -35,18 +35,17 @@ uint32 charging_counter;
 
 void initialize_charging(void) {
 	telemetry.bus_status = BUS_OFF;
-	if ((confparam[CONF_PS_SCHEME].value == BAT_BOOST_BUS_SCHEME) ||
-		(confparam[CONF_PS_SCHEME].value == AC_OR_BATBOOST_SCHEME)) {
+	if ((confparam[CONF_PS_SCHEME].value == BAT_BOOST_BUS_SCHEME) || (confparam[CONF_PS_SCHEME].value == AC_OR_BATBOOST_SCHEME)) {
 		SLR_Control = 0;
 		SLRPWM_Start();
 		if (confparam[CONF_SLR_FSWITCH].value == 0) {
-			confparam[CONF_SLR_FSWITCH].value = 500; // just in case it wasnt ever programmed
-			// store_setting(SET_SLR_FSWITCH, config.SLR_Fswitch);
+			confparam[CONF_SLR_FSWITCH].value = 500; //just in case it wasnt ever programmed
+													 //store_setting(SET_SLR_FSWITCH, config.SLR_Fswitch);
 		}
 		uint16 x;
 		x = (320000 / (confparam[CONF_SLR_FSWITCH].value));
 		if ((x % 2) != 0)
-			x++; // we want x to be even
+			x++; //we want x to be even
 		SLRPWM_WritePeriod(x + 1);
 		SLRPWM_WriteCompare(x >> 1);
 	}
@@ -56,8 +55,7 @@ void initialize_charging(void) {
 }
 char buf[100];
 
-void control_precharge(
-	void) { // this gets called from analogs.c when the ADC data set is ready, 8khz rep rate
+void control_precharge(void) { //this gets called from analogs.c when the ADC data set is ready, 8khz rep rate
 	uint32 v_threshold;
 	static uint8_t cnt = 0;
 
@@ -86,7 +84,7 @@ void control_precharge(
 		else if (confparam[CONF_PS_SCHEME].value == BAT_BOOST_BUS_SCHEME) {
 			if (telemetry.bus_v < (confparam[CONF_SLR_VBUS].value - 15)) {
 				SLR_Control = 1;
-				telemetry.bus_status = BUS_READY; // its OK to operate the TC when charging from SLR
+				telemetry.bus_status = BUS_READY; //its OK to operate the TC when charging from SLR
 			} else if (telemetry.bus_v > confparam[CONF_SLR_VBUS].value) {
 				SLR_Control = 0;
 				telemetry.bus_status = BUS_READY;
@@ -105,9 +103,8 @@ void control_precharge(
 		}
 
 		else if (confparam[CONF_PS_SCHEME].value == AC_PRECHARGE_BUS_SCHEME) {
-			// we cant know the AC line voltage so we will watch the bus voltage climb
-			// and infer when its charged by it not increasing fast enough
-			// this logic is part of a charging counter
+			//we cant know the AC line voltage so we will watch the bus voltage climb and infer when its charged by it not increasing fast enough
+			//this logic is part of a charging counter
 			if (charging_counter == 0)
 				initial_vbus = telemetry.bus_v;
 			charging_counter++;
@@ -127,11 +124,11 @@ void control_precharge(
 		}
 
 		else if (confparam[CONF_PS_SCHEME].value == AC_OR_BATBOOST_SCHEME) {
-			// this routine determines if the battery or the AC line should be used
-			// first, assume there is mains voltage
+			//this routine determines if the battery or the AC line should be used
+			//first, assume there is mains voltage
 			relay_Write(RELAY_CHARGE);
 			telemetry.bus_status = BUS_CHARGING;
-			// test if this is true by watching the bus voltage increase
+			//test if this is true by watching the bus voltage increase
 			if (charging_counter == 0)
 				initial_vbus = telemetry.bus_v;
 			charging_counter++;
@@ -140,7 +137,7 @@ void control_precharge(
 				delta_vbus = final_vbus - initial_vbus;
 				if (delta_vbus > 4)
 					confparam[CONF_PS_SCHEME].value = AC_PRECHARGE_BUS_SCHEME;
-				// if this fails, check, is there battery voltage?
+				//if this fails, check, is there battery voltage?
 				else if (telemetry.batt_v >= (confparam[CONF_BATT_LOCKOUT_V].value - 1)) {
 					confparam[CONF_PS_SCHEME].value = BAT_BOOST_BUS_SCHEME;
 					relay_Write(RELAY_OFF);

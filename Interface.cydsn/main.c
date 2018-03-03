@@ -212,25 +212,23 @@ int main(void) {
 		}
 
 		/* Handle enumeration of USB port */
-		if (USBMIDI_1_IsConfigurationChanged() !=
-			0u) /* Host could send double SET_INTERFACE request */
+		if (USBMIDI_1_IsConfigurationChanged() != 0u) /* Host could send double SET_INTERFACE request */
 		{
 			if (USBMIDI_1_GetConfiguration() != 0u) /* Init IN endpoints when device configured */
 			{
-				/* Enumeration is done, enable OUT endpoint for receive data from
-				 * Host */
+				/* Enumeration is done, enable OUT endpoint for receive data from Host */
 				USBMIDI_1_CDC_Init();
 				USBMIDI_1_MIDI_Init();
 			}
 		}
 		/*
-		 *
-		 */
+    	 *
+    	 */
 		if (USBMIDI_1_GetConfiguration() != 0u) {
 /*
- * Process received data from the USB, and store it in to the
- * receiver message Q.
- */
+    		 * Process received data from the USB, and store it in to the
+    		 * receiver message Q.
+    		 */
 
 #if (!USBMIDI_1_EP_MANAGEMENT_DMA_AUTO)
 			USBMIDI_1_MIDI_OUT_Service();
@@ -243,45 +241,42 @@ int main(void) {
 					UART_1_PutArray(buffer, count);
 					byte_tx += count;
 
-					//					for(idx=0;idx<count;++idx)
-					//{
-					//						xQueueSend( qUSB_rx,
-					//(void*)&buffer[idx],0);
+					//					for(idx=0;idx<count;++idx) {
+					//						xQueueSend( qUSB_rx, (void*)&buffer[idx],0);
 					//					}
 				}
 			}
 			/*
-			 * Send a block of data ack through the USB port to the PC,
-			 * by checkig to see if there is data to send, then sending
-			 * up to the BUFFER_LEN of data (64 bytes)
-			 */
+    		 * Send a block of data ack through the USB port to the PC,
+    		 * by checkig to see if there is data to send, then sending
+    		 * up to the BUFFER_LEN of data (64 bytes)
+    		 */
 			count = UART_1_GetRxBufferSize();
 			count = (count > tsk_usb_BUFFER_LEN) ? tsk_usb_BUFFER_LEN : count;
 
 			/* When component is ready to send more data to the PC */
 			if ((USBMIDI_1_CDCIsReady() != 0u) && (count > 0)) {
 				/*
-				 * Read the data from the transmit queue and buffer it
-				 * locally so that the data can be utilized.
-				 */
+    			 * Read the data from the transmit queue and buffer it
+    			 * locally so that the data can be utilized.
+    			 */
 
 				for (idx = 0; idx < count; ++idx) {
 					buffer[idx] = UART_1_GetChar();
 					byte_rx += 1;
-					// xQueueReceive( qUSB_tx,&buffer[idx],0);
+					//xQueueReceive( qUSB_tx,&buffer[idx],0);
 				}
 				/* Send data back to host */
 				USBMIDI_1_PutData(buffer, count);
 
-				/* If the last sent packet is exactly maximum packet size,
-			 *  it shall be followed by a zero-length packet to assure the
-			 *  end of segment is properly identified by the terminal.
-			 */
+				/* If the last sent packet is exactly maximum packet size, 
+            	 *  it shall be followed by a zero-length packet to assure the
+             	 *  end of segment is properly identified by the terminal.
+             	 */
 				if (count == tsk_usb_BUFFER_LEN) {
-					/* Wait till component is ready to send more data to the PC
-					 */
+					/* Wait till component is ready to send more data to the PC */
 					while (USBMIDI_1_CDCIsReady() == 0u) {
-						// vTaskDelay( 10 / portTICK_RATE_MS );
+						//vTaskDelay( 10 / portTICK_RATE_MS );
 					}
 					USBMIDI_1_PutData(NULL, 0u); /* Send zero-length packet to PC */
 				}

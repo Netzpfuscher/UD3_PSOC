@@ -32,7 +32,8 @@
 #define DAC_VOLTS_PER_STEP 0.016
 #define R_BURDEN 3.3
 
-typedef struct {
+typedef struct
+{
 	uint8 max_tr_cl_dac_val;
 	uint16 lead_time;
 	uint16 pwma_start_prd;
@@ -54,8 +55,8 @@ typedef struct {
 } parameters;
 volatile parameters params;
 
-// variables read by DMA for PWM stuffs
-uint16 pwma_init_val; // holds the initial PWMA compare2 value, DMA transfers it to the PWMA module
+//variables read by DMA for PWM stuffs
+uint16 pwma_init_val; //holds the initial PWMA compare2 value, DMA transfers it to the PWMA module
 uint16 fb_filter_in;
 uint16 fb_filter_out;
 uint16 fb_fake;

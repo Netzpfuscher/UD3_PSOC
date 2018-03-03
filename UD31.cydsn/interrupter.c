@@ -49,26 +49,27 @@ CY_ISR(qcw_end_ISR) {
 	QCW_enable_Control = 0;
 }
 
-CY_ISR(qcw_dl_ovf_ISR) { qcw_dl_ovf_counter = 1; }
+CY_ISR(qcw_dl_ovf_ISR) {
+	qcw_dl_ovf_counter = 1;
+}
 
-// CY_ISR(OCD_ISR)
+//CY_ISR(OCD_ISR)
 //{
 //    //QCW_enable_Control = 0;
 //}
 
 void initialize_interrupter(void) {
 
-	// over current detection
+	//over current detection
 	//    OCD_StartEx(OCD_ISR);
 
-	// initialize the PWM generators for safe PW and PRD
+	//initialize the PWM generators for safe PW and PRD
 	interrupter1_WritePeriod(65000);
 	interrupter1_WriteCompare2(65000);
 	interrupter1_WriteCompare1(64999);
 
 	QCW_duty_limiter_WritePeriod(65535);
-	QCW_duty_limiter_WriteCompare(
-		65535 - confparam[CONF_MAX_QCW_PW].value); // this register sets the max PW output
+	QCW_duty_limiter_WriteCompare(65535 - confparam[CONF_MAX_QCW_PW].value); //this register sets the max PW output
 
 	int1_prd = 65000;
 	int1_cmp = 64999;
@@ -77,7 +78,7 @@ void initialize_interrupter(void) {
 	ramp.modulation_value = 0;
 	ramp.modulation_value_previous = 0;
 
-	// Start up timers
+	//Start up timers
 	interrupter1_Start();
 	QCW_duty_limiter_Start();
 	interrupter_watchdog_Start();
@@ -89,8 +90,7 @@ void initialize_interrupter(void) {
 	qcw_end_StartEx(qcw_end_ISR);
 
 	if (confparam[CONF_EXT_TRIG_ENABLE].value) {
-		trigger_bypass_Write(0); // 0 enables the trigger input, 1 bypasses it so the
-								 // interrupter can always run
+		trigger_bypass_Write(0); //0 enables the trigger input, 1 bypasses it so the interrupter can always run
 	} else {
 		trigger_bypass_Write(1);
 	}
@@ -106,74 +106,57 @@ void initialize_interrupter(void) {
 	int1_dma_TD[1] = CyDmaTdAllocate();
 	int1_dma_TD[2] = CyDmaTdAllocate();
 	int1_dma_TD[3] = CyDmaTdAllocate();
-	CyDmaTdSetConfiguration(int1_dma_TD[0], 2, int1_dma_TD[1],
-							int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
-	CyDmaTdSetConfiguration(int1_dma_TD[1], 2, int1_dma_TD[2],
-							int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
-	CyDmaTdSetConfiguration(int1_dma_TD[2], 2, int1_dma_TD[3],
-							int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
+	CyDmaTdSetConfiguration(int1_dma_TD[0], 2, int1_dma_TD[1], int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
+	CyDmaTdSetConfiguration(int1_dma_TD[1], 2, int1_dma_TD[2], int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
+	CyDmaTdSetConfiguration(int1_dma_TD[2], 2, int1_dma_TD[3], int1_dma__TD_TERMOUT_EN | TD_AUTO_EXEC_NEXT);
 	CyDmaTdSetConfiguration(int1_dma_TD[3], 2, int1_dma_TD[0], int1_dma__TD_TERMOUT_EN);
-	CyDmaTdSetAddress(int1_dma_TD[0], LO16((uint32)&int1_prd),
-					  LO16((uint32)interrupter1_PERIOD_LSB_PTR));
-	CyDmaTdSetAddress(int1_dma_TD[1], LO16((uint32)&int1_cmp),
-					  LO16((uint32)interrupter1_COMPARE1_LSB_PTR));
-	CyDmaTdSetAddress(int1_dma_TD[2], LO16((uint32)&int1_prd),
-					  LO16((uint32)interrupter1_COMPARE2_LSB_PTR));
-	CyDmaTdSetAddress(int1_dma_TD[3], LO16((uint32)&int1_prd),
-					  LO16((uint32)interrupter1_COUNTER_LSB_PTR));
+	CyDmaTdSetAddress(int1_dma_TD[0], LO16((uint32)&int1_prd), LO16((uint32)interrupter1_PERIOD_LSB_PTR));
+	CyDmaTdSetAddress(int1_dma_TD[1], LO16((uint32)&int1_cmp), LO16((uint32)interrupter1_COMPARE1_LSB_PTR));
+	CyDmaTdSetAddress(int1_dma_TD[2], LO16((uint32)&int1_prd), LO16((uint32)interrupter1_COMPARE2_LSB_PTR));
+	CyDmaTdSetAddress(int1_dma_TD[3], LO16((uint32)&int1_prd), LO16((uint32)interrupter1_COUNTER_LSB_PTR));
 	CyDmaChSetInitialTd(int1_dma_Chan, int1_dma_TD[0]);
 	CyDmaChEnable(int1_dma_Chan, 1);
 }
 
 void ramp_control(void) {
 	if (ramp.modulation_value != 0) {
-		if (ramp.modulation_value_previous == 0) // indicates a new QCW pulse starting
+		if (ramp.modulation_value_previous == 0) //indicates a new QCW pulse starting
 		{
-			// before starting the QCW pulse, capture the previous QCW period from the
-			// QCW_duty_limiter PWM, then calculate the permissible PW for that PWM
+			//before starting the QCW pulse, capture the previous QCW period from the QCW_duty_limiter PWM, then calculate the permissible PW for that PWM
 			if (qcw_dl_ovf_counter)
-				ramp.qcw_recorded_prd = 65535; // if there was an overflow of this
-											   // PWM, then the period is > 655mS,
-											   // so clamp it there
+				ramp.qcw_recorded_prd = 65535; //if there was an overflow of this PWM, then the period is > 655mS, so clamp it there
 			else
-				ramp.qcw_recorded_prd = 65535 - QCW_duty_limiter_ReadCounter(); // else, look at the
-			// counter to see where
-			// we are at since last
-			// pulse
+				ramp.qcw_recorded_prd = 65535 - QCW_duty_limiter_ReadCounter(); //else, look at the counter to see where we are at since last pulse
 			qcw_dl_ovf_counter = 0;
-			ramp.qcw_limiter_pw =
-				(ramp.qcw_recorded_prd * confparam[CONF_MAX_QCW_DUTY].value) / 1000;
-			if ((ramp.qcw_limiter_pw > confparam[CONF_MAX_QCW_PW].value) ||
-				(ramp.qcw_limiter_pw == 0)) {
+			ramp.qcw_limiter_pw = (ramp.qcw_recorded_prd * confparam[CONF_MAX_QCW_DUTY].value) / 1000;
+			if ((ramp.qcw_limiter_pw > confparam[CONF_MAX_QCW_PW].value) || (ramp.qcw_limiter_pw == 0)) {
 				ramp.qcw_limiter_pw = confparam[CONF_MAX_QCW_PW].value;
 			}
-			// the next stuff is time sensitive, so disable interrupts to avoid glitches
+			//the next stuff is time sensitive, so disable interrupts to avoid glitches
 			CyGlobalIntDisable;
-			QCW_duty_limiter_WriteCounter(65535); // restart counter at top value
-			QCW_duty_limiter_WriteCompare(
-				65535 - ramp.qcw_limiter_pw); // put in limiting compare match value
-			// now enable the QCW interrupter
+			QCW_duty_limiter_WriteCounter(65535);						//restart counter at top value
+			QCW_duty_limiter_WriteCompare(65535 - ramp.qcw_limiter_pw); //put in limiting compare match value
+			//now enable the QCW interrupter
 			QCW_enable_Control = 1;
 			watchdog_reset_Control = 1;
 			watchdog_reset_Control = 0;
 			params.pwmb_psb_val = params.pwm_top - params.pwmb_start_psb_val;
 			CyGlobalIntEnable;
 		} else {
-			// linearize modulation value based on fb_filter_out period
+			//linearize modulation value based on fb_filter_out period
 			ramp.shift_period = (ramp.modulation_value * (params.pwm_top - fb_filter_out)) >> 8;
-			// assign new modulation value to the params.pwmb_psb_val ram
+			//assign new modulation value to the params.pwmb_psb_val ram
 			if ((ramp.shift_period + params.pwmb_start_psb_val) > (params.pwmb_start_prd - 4)) {
 				params.pwmb_psb_val = 4;
 			} else {
-				params.pwmb_psb_val =
-					params.pwm_top - (ramp.shift_period + params.pwmb_start_psb_val);
+				params.pwmb_psb_val = params.pwm_top - (ramp.shift_period + params.pwmb_start_psb_val);
 			}
 		}
 	} else //(ramp.modulation_value == 0) //indicates the switching should stop
 	{
 		QCW_enable_Control = 0;
 	}
-	// grab the old modulation value so it can be used to detect start of ramp
+	//grab the old modulation value so it can be used to detect start of ramp
 	ramp.modulation_value_previous = ramp.modulation_value;
 }
 
@@ -196,8 +179,8 @@ void interrupter_oneshot(uint16_t pw, uint8_t vol) {
 	interrupter1_control_Control = 0b00;
 	CyGlobalIntEnable;
 	/* Reset Watchdog */
-	// watchdog_reset_Control = 1;
-	// watchdog_reset_Control = 0;
+	//watchdog_reset_Control = 1;
+	//watchdog_reset_Control = 0;
 	return;
 }
 
@@ -221,8 +204,7 @@ void update_interrupter() {
 	/* Compute the duty cycle and mod the PW if required */
 	uint16 total_duty;
 	uint16 new_duty;
-	interrupter.duty =
-		(interrupter.pw * 1000) / interrupter.prd; // gives duty cycle as 0.1% increment
+	interrupter.duty = (interrupter.pw * 1000) / interrupter.prd; //gives duty cycle as 0.1% increment
 	total_duty = interrupter.duty;
 	if (total_duty > confparam[CONF_MAX_TR_DUTY].value) {
 		new_duty = (confparam[CONF_MAX_TR_DUTY].value * interrupter.duty) / total_duty;

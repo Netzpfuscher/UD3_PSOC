@@ -76,10 +76,10 @@ typedef struct parameter_entry_struct parameter_entry;
 #define MODE_CLASSIC 1
 #define MODE_UDCLASSIC 2
 
-#define fan_controller 1  // enables fan controller
-#define auto_charge_bus 0 // enables auto charging of DC bus on start up (no wait for command)
+#define fan_controller 1  //enables fan controller
+#define auto_charge_bus 0 //enables auto charging of DC bus on start up (no wait for command)
 #define auto_charge_battery 0
-#define ext_trig_runs_CW 0 // special test mode where holding the trigger runs the coil in CW mode
+#define ext_trig_runs_CW 0 //special test mode where holding the trigger runs the coil in CW mode
 
 #define SERIAL 0
 #define USB 1
@@ -107,7 +107,7 @@ uint8_t eprom_load(void);
 void initialize_term(void);
 void task_terminal_overlay(void);
 
-/// Help
+///Help
 void task_terminal();
 
 extern volatile parameter_entry tparameters[];

@@ -49,9 +49,9 @@
 #include "tsk_uart.h"
 #include "tsk_usb.h"
 
-#define UNUSED_VARIABLE(N)                                                                         \
-	do {                                                                                           \
-		(void)(N);                                                                                 \
+#define UNUSED_VARIABLE(N) \
+	do {                   \
+		(void)(N);         \
 	} while (0)
 
 typedef struct {
@@ -133,7 +133,7 @@ parameter_entry confparam[] = {
     { "slr_fswitch"         , 500   , 0		,1000   , updateConfigFunction  ,"SLR switch frequency [Hz*100]"},
     { "slr_vbus"            , 200   , 0		,1000   , updateConfigFunction  ,"SLR Vbus [V]"},
     { "ps_scheme"           , 2     , 0		,4      , updateConfigFunction  ,"Power supply sheme"},
-    { "autotune_s"          , 1     , 1 	,32     , updateConfDefFunction,"Number of samples for Autotune"},
+    { "autotune_s"          , 1     , 1 	,32     , updateConfDefFunction ,"Number of samples for Autotune"},
  	//
 };
 
@@ -221,7 +221,7 @@ uint8_t updateTRFunction(int newValue, uint8_t index) {
 uint8_t updateConfigFunction(int newValue, uint8_t index) {
 	if (newValue >= confparam[index].min && newValue <= confparam[index].max) {
 		uint8 sfflag = system_fault_Read();
-		system_fault_Control = 0; // halt tesla coil operation during updates!
+		system_fault_Control = 0; //halt tesla coil operation during updates!
 		confparam[index].value = newValue;
 		initialize_interrupter();
 		initialize_charging();
@@ -234,8 +234,8 @@ uint8_t updateConfigFunction(int newValue, uint8_t index) {
 
 uint8_t command_bus(char *commandline, uint8_t port) {
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++;						   // Leerzeichen überspringen
-	if (*commandline == 0 || commandline == 0) // Kein Parametername --> Liste anzeigen
+		commandline++;						   //Leerzeichen überspringen
+	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
 	{
 		Term_Color_Red(port);
 		send_string("Usage: bus [on|off]\r\n", port);
@@ -259,9 +259,9 @@ uint8_t command_status(char *commandline, uint8_t port) {
 	static xTaskHandle overlay_Serial_TaskHandle;
 	static xTaskHandle overlay_USB_TaskHandle;
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++; // Leerzeichen überspringen
+		commandline++; //Leerzeichen überspringen
 
-	if (*commandline == 0 || commandline == 0) // Kein Parametername --> Liste anzeigen
+	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
 	{
 		Term_Color_Red(port);
 		send_string("Usage: status [start|stop]\r\n", port);
@@ -273,18 +273,16 @@ uint8_t command_status(char *commandline, uint8_t port) {
 		switch (port) {
 		case SERIAL:
 			if (overlay_Serial_TaskHandle == NULL) {
-				xTaskCreate(tsk_overlay_TaskProc, "Overl_S", 256, (void *)SERIAL, PRIO_OVERLAY,
-							&overlay_Serial_TaskHandle);
+				xTaskCreate(tsk_overlay_TaskProc, "Overl_S", 256, (void *)SERIAL, PRIO_OVERLAY, &overlay_Serial_TaskHandle);
 			}
 			break;
 		case USB:
 			if (overlay_USB_TaskHandle == NULL) {
-				xTaskCreate(tsk_overlay_TaskProc, "Overl_U", 256, (void *)USB, PRIO_OVERLAY,
-							&overlay_USB_TaskHandle);
+				xTaskCreate(tsk_overlay_TaskProc, "Overl_U", 256, (void *)USB, PRIO_OVERLAY, &overlay_USB_TaskHandle);
 			}
 			break;
 		}
-		// ntshell_set_scroll_region(&ntserial,20,40);
+		//ntshell_set_scroll_region(&ntserial,20,40);
 	}
 	if (strcmp(commandline, "stop") == 0) {
 		switch (port) {
@@ -316,35 +314,39 @@ uint8_t command_bootloader(char *commandline, uint8_t port) {
 	return 1;
 }
 
-void Term_Save_Cursor(uint8_t port) { send_string("\033[s", port); }
-void Term_Restore_Cursor(uint8_t port) { send_string("\033[u", port); }
+void Term_Save_Cursor(uint8_t port) {
+	send_string("\033[s", port);
+}
+void Term_Restore_Cursor(uint8_t port) {
+	send_string("\033[u", port);
+}
 
 void Term_Box(uint8_t row1, uint8_t col1, uint8_t row2, uint8_t col2, uint8_t port) {
 	Term_Move_Cursor(row1, col1, port);
 	Term_BGColor_Blue(port);
-	send_string("\xE2\x95\x94", port); // edge upper left
+	send_string("\xE2\x95\x94", port); //edge upper left
 	int i = 0;
 	for (i = 1; i < (col2 - col1); i++) {
 		send_string("\xE2\x95\x90", port); //=
 	}
-	send_string("\xE2\x95\x97", port); // edge upper right
+	send_string("\xE2\x95\x97", port); //edge upper right
 	for (i = 1; i < (row2 - row1); i++) {
 		Term_Move_Cursor(row1 + i, col1, port);
-		send_string("\xE2\x95\x91", port); // left ||
+		send_string("\xE2\x95\x91", port); //left ||
 		Term_Move_Cursor(row1 + i, col2, port);
-		send_string("\xE2\x95\x91", port); // right ||
+		send_string("\xE2\x95\x91", port); //right ||
 	}
 	Term_Move_Cursor(row2, col1, port);
-	send_string("\xE2\x95\x9A", port); // edge lower left
+	send_string("\xE2\x95\x9A", port); //edge lower left
 	for (i = 1; i < (col2 - col1); i++) {
 		send_string("\xE2\x95\x90", port); //=
 	}
-	send_string("\xE2\x95\x9D", port); // edge lower right
+	send_string("\xE2\x95\x9D", port); //edge lower right
 	Term_Color_White(port);
 }
 
 uint8_t command_window(char *commandline, uint8_t port) {
-	if (*commandline == 0 || commandline == 0) // Kein Parametername --> Liste anzeigen
+	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
 	{
 		Term_Color_Red(port);
 		send_string("Usage: window [string]\r\n", port);
@@ -365,9 +367,9 @@ uint8_t command_window(char *commandline, uint8_t port) {
 uint8_t command_tr(char *commandline, uint8_t port) {
 
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++; // Leerzeichen überspringen
+		commandline++; //Leerzeichen überspringen
 
-	if (*commandline == 0 || commandline == 0) // Kein Parametername --> Liste anzeigen
+	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
 	{
 		Term_Color_Red(port);
 		send_string("Usage: tr [start|stop]\r\n", port);
@@ -396,9 +398,9 @@ uint8_t command_tr(char *commandline, uint8_t port) {
 uint8_t command_qcw(char *commandline, uint8_t port) {
 
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++; // Leerzeichen überspringen
+		commandline++; //Leerzeichen überspringen
 
-	if (*commandline == 0 || commandline == 0) // Kein Parametername --> Liste anzeigen
+	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
 	{
 		Term_Color_Red(port);
 		send_string("Usage: qcw [start|stop]\r\n", port);
@@ -433,16 +435,12 @@ uint8_t command_udkill(char *commandline, uint8_t port) {
 }
 
 uint8_t command_tune_p(char *commandline, uint8_t port) {
-	run_adc_sweep(tparameters[PARAM_TUNE_SFREQ].value, tparameters[PARAM_TUNE_EFREQ].value,
-				  tparameters[PARAM_TUNE_PW].value, CT_PRIMARY, tparameters[PARAM_TUNE_DELAY].value,
-				  port);
+	run_adc_sweep(tparameters[PARAM_TUNE_SFREQ].value, tparameters[PARAM_TUNE_EFREQ].value, tparameters[PARAM_TUNE_PW].value, CT_PRIMARY, tparameters[PARAM_TUNE_DELAY].value, port);
 	return 0;
 }
 
 uint8_t command_tune_s(char *commandline, uint8_t port) {
-	run_adc_sweep(tparameters[PARAM_TUNE_SFREQ].value, tparameters[PARAM_TUNE_EFREQ].value,
-				  tparameters[PARAM_TUNE_PW].value, CT_SECONDARY,
-				  tparameters[PARAM_TUNE_DELAY].value, port);
+	run_adc_sweep(tparameters[PARAM_TUNE_SFREQ].value, tparameters[PARAM_TUNE_EFREQ].value, tparameters[PARAM_TUNE_PW].value, CT_SECONDARY, tparameters[PARAM_TUNE_DELAY].value, port);
 	return 0;
 }
 
@@ -462,34 +460,26 @@ uint8_t commandGet(char *commandline, uint8_t port) {
 	uint8_t current_parameter;
 
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++; // Leerzeichen überspringen
+		commandline++; //Leerzeichen überspringen
 
-	if (*commandline == 0 || commandline == 0) // Kein Parametername --> Liste anzeigen
+	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
 	{
 		send_string("\tParameter\t\t| Value\t\t| Text\r\n", port);
-		for (current_parameter = 0;
-			 current_parameter < sizeof(tparameters) / sizeof(parameter_entry);
-			 current_parameter++) {
+		for (current_parameter = 0; current_parameter < sizeof(tparameters) / sizeof(parameter_entry); current_parameter++) {
 			if (strlen(tparameters[current_parameter].name) > 7) {
-				sprintf(buffer, "\t\033[36m%s\033[37m\t\t| \033[32m%i\033[37m\t\t| %s\r\n",
-						tparameters[current_parameter].name, tparameters[current_parameter].value,
-						tparameters[current_parameter].help);
+				sprintf(buffer, "\t\033[36m%s\033[37m\t\t| \033[32m%i\033[37m\t\t| %s\r\n", tparameters[current_parameter].name, tparameters[current_parameter].value, tparameters[current_parameter].help);
 			} else {
-				sprintf(buffer, "\t\033[36m%s\033[37m\t\t\t| \033[32m%i\033[37m\t\t| %s\r\n",
-						tparameters[current_parameter].name, tparameters[current_parameter].value,
-						tparameters[current_parameter].help);
+				sprintf(buffer, "\t\033[36m%s\033[37m\t\t\t| \033[32m%i\033[37m\t\t| %s\r\n", tparameters[current_parameter].name, tparameters[current_parameter].value, tparameters[current_parameter].help);
 			}
 			send_string(buffer, port);
 		}
 		return 1;
 	}
 
-	for (current_parameter = 0; current_parameter < sizeof(tparameters) / sizeof(parameter_entry);
-		 current_parameter++) {
+	for (current_parameter = 0; current_parameter < sizeof(tparameters) / sizeof(parameter_entry); current_parameter++) {
 		if (strcmp(commandline, tparameters[current_parameter].name) == 0) {
-			// Parameter not found:
-			sprintf(buffer, "\t%s=%i\r\n", tparameters[current_parameter].name,
-					tparameters[current_parameter].value);
+			//Parameter not found:
+			sprintf(buffer, "\t%s=%i\r\n", tparameters[current_parameter].name, tparameters[current_parameter].value);
 			send_string(buffer, port);
 			return 1;
 		}
@@ -505,33 +495,26 @@ uint8_t commandGetConf(char *commandline, uint8_t port) {
 	uint8_t current_parameter;
 
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++; // Leerzeichen überspringen
+		commandline++; //Leerzeichen überspringen
 
-	if (*commandline == 0 || commandline == 0) // Kein Parametername --> Liste anzeigen
+	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
 	{
 		send_string("\tParameter\t\t| Value\t\t| Text\r\n", port);
-		for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry);
-			 current_parameter++) {
+		for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry); current_parameter++) {
 			if (strlen(confparam[current_parameter].name) > 7) {
-				sprintf(buffer, "\t\t\033[36m%s\033[37m\t\t| \033[32m%i\033[37m\t\t| %s\r\n",
-						confparam[current_parameter].name, confparam[current_parameter].value,
-						confparam[current_parameter].help);
+				sprintf(buffer, "\t\t\033[36m%s\033[37m\t\t| \033[32m%i\033[37m\t\t| %s\r\n", confparam[current_parameter].name, confparam[current_parameter].value, confparam[current_parameter].help);
 			} else {
-				sprintf(buffer, "\t\t\033[36m%s\033[37m\t\t\t| \033[32m%i\033[37m\t\t| %s\r\n",
-						confparam[current_parameter].name, confparam[current_parameter].value,
-						confparam[current_parameter].help);
+				sprintf(buffer, "\t\t\033[36m%s\033[37m\t\t\t| \033[32m%i\033[37m\t\t| %s\r\n", confparam[current_parameter].name, confparam[current_parameter].value, confparam[current_parameter].help);
 			}
 			send_string(buffer, port);
 		}
 		return 1;
 	}
 
-	for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry);
-		 current_parameter++) {
+	for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry); current_parameter++) {
 		if (strcmp(commandline, confparam[current_parameter].name) == 0) {
-			// Parameter not found:
-			sprintf(buffer, "\t%s=%i\r\n", confparam[current_parameter].name,
-					confparam[current_parameter].value);
+			//Parameter not found:
+			sprintf(buffer, "\t%s=%i\r\n", confparam[current_parameter].name, confparam[current_parameter].value);
 			send_string(buffer, port);
 			return 1;
 		}
@@ -565,7 +548,7 @@ uint8_t commandSet(char *commandline, uint8_t port) {
 		return 0;
 	}
 
-	// Trennzeichen gefunden und durch \0 ersetzen, um Strings zu trennen
+	//Trennzeichen gefunden und durch \0 ersetzen, um Strings zu trennen
 	*param_value = 0;
 	param_value++;
 
@@ -577,17 +560,14 @@ uint8_t commandSet(char *commandline, uint8_t port) {
 	}
 
 	uint8_t current_parameter;
-	for (current_parameter = 0; current_parameter < sizeof(tparameters) / sizeof(parameter_entry);
-		 current_parameter++) {
+	for (current_parameter = 0; current_parameter < sizeof(tparameters) / sizeof(parameter_entry); current_parameter++) {
 		if (strcmp(commandline, tparameters[current_parameter].name) == 0) {
-			// Parameter-Name gefunden:
+			//Parameter-Name gefunden:
 			int new_value;
 			new_value = atoi(param_value);
 
-			if (new_value < tparameters[current_parameter].min ||
-				new_value > tparameters[current_parameter].max) {
-				sprintf(buffer, "E:Range %i-%i\r\n", tparameters[current_parameter].min,
-						tparameters[current_parameter].max);
+			if (new_value < tparameters[current_parameter].min || new_value > tparameters[current_parameter].max) {
+				sprintf(buffer, "E:Range %i-%i\r\n", tparameters[current_parameter].min, tparameters[current_parameter].max);
 				Term_Color_Red(port);
 				send_string(buffer, port);
 				Term_Color_White(port);
@@ -595,7 +575,7 @@ uint8_t commandSet(char *commandline, uint8_t port) {
 			}
 
 			if (tparameters[current_parameter].updateFunction(new_value, current_parameter)) {
-				tparameters[current_parameter].value = new_value; // Wert übernehmen
+				tparameters[current_parameter].value = new_value; //Wert übernehmen
 				Term_Color_Green(port);
 				send_string("OK\r\n", port);
 				Term_Color_White(port);
@@ -637,7 +617,7 @@ uint8_t commandSetConf(char *commandline, uint8_t port) {
 		return 0;
 	}
 
-	// Trennzeichen gefunden und durch \0 ersetzen, um Strings zu trennen
+	//Trennzeichen gefunden und durch \0 ersetzen, um Strings zu trennen
 	*param_value = 0;
 	param_value++;
 
@@ -649,25 +629,22 @@ uint8_t commandSetConf(char *commandline, uint8_t port) {
 	}
 
 	uint8_t current_parameter;
-	for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry);
-		 current_parameter++) {
+	for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry); current_parameter++) {
 		if (strcmp(commandline, confparam[current_parameter].name) == 0) {
-			// Parameter-Name gefunden:
+			//Parameter-Name gefunden:
 			int new_value;
 			new_value = atoi(param_value);
 
-			if (new_value < confparam[current_parameter].min ||
-				new_value > confparam[current_parameter].max) {
+			if (new_value < confparam[current_parameter].min || new_value > confparam[current_parameter].max) {
 				Term_Color_Red(port);
-				sprintf(buffer, "E:Range %i-%i\r\n", confparam[current_parameter].min,
-						confparam[current_parameter].max);
+				sprintf(buffer, "E:Range %i-%i\r\n", confparam[current_parameter].min, confparam[current_parameter].max);
 				send_string(buffer, port);
 				Term_Color_White(port);
 				return 0;
 			}
 
 			if (confparam[current_parameter].updateFunction(new_value, current_parameter)) {
-				confparam[current_parameter].value = new_value; // Wert übernehmen
+				confparam[current_parameter].value = new_value; //Wert übernehmen
 				Term_Color_Green(port);
 				send_string("OK\r\n", port);
 				Term_Color_White(port);
@@ -688,7 +665,7 @@ uint8_t commandSetConf(char *commandline, uint8_t port) {
 uint8_t eprom_load(void) {
 	uint8_t current_parameter;
 	uint8 sfflag = system_fault_Read();
-	system_fault_Control = 0; // halt tesla coil operation during updates!
+	system_fault_Control = 0; //halt tesla coil operation during updates!
 	uint16_t count = 0;
 	count = (sizeof(confparam) / sizeof(parameter_entry)) * 2;
 	if (EEPROM_1_ReadByte(count) != 0xDE)
@@ -704,8 +681,7 @@ uint8_t eprom_load(void) {
 		return 0;
 	count = 0;
 
-	for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry);
-		 current_parameter++) {
+	for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry); current_parameter++) {
 		confparam[current_parameter].value = EEPROM_1_ReadByte(count);
 		count++;
 		confparam[current_parameter].value |= EEPROM_1_ReadByte(count) << 8;
@@ -724,9 +700,9 @@ uint8_t eprom_load(void) {
 uint8_t command_eprom(char *commandline, uint8_t port) {
 	char buffer[44];
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++; // skip space
+		commandline++; //skip space
 
-	if (*commandline == 0 || commandline == 0) // no param show list
+	if (*commandline == 0 || commandline == 0) //no param show list
 	{
 		Term_Color_Red(port);
 		send_string("Usage: eprom [load|save]\r\n", port);
@@ -738,12 +714,11 @@ uint8_t command_eprom(char *commandline, uint8_t port) {
 	uint8_t change_flag = 0;
 	uint16_t change_count = 0;
 	uint8 sfflag = system_fault_Read();
-	system_fault_Control = 0; // halt tesla coil operation during updates!
+	system_fault_Control = 0; //halt tesla coil operation during updates!
 	if (strcmp(commandline, "save") == 0) {
 
 		EEPROM_1_UpdateTemperature();
-		for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry);
-			 current_parameter++) {
+		for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry); current_parameter++) {
 			change_flag = 0;
 			if (EEPROM_1_ReadByte(count) != LO8(confparam[current_parameter].value)) {
 				EEPROM_1_WriteByte(LO8(confparam[current_parameter].value), count);
@@ -766,12 +741,11 @@ uint8_t command_eprom(char *commandline, uint8_t port) {
 		EEPROM_1_WriteByte(0xBE, count);
 		count++;
 		EEPROM_1_WriteByte(0xEF, count);
-		sprintf(buffer, "%i / %i new config params written\r\n", change_count,
-				sizeof(confparam) / sizeof(parameter_entry));
+		sprintf(buffer, "%i / %i new config params written\r\n", change_count, sizeof(confparam) / sizeof(parameter_entry));
 		Term_Color_Green(port);
 		send_string(buffer, port);
 		Term_Color_White(port);
-		// send_string("\r\nWrite EEPROM OK\r\n", port);
+		//send_string("\r\nWrite EEPROM OK\r\n", port);
 		system_fault_Control = sfflag;
 		return 0;
 	}
@@ -795,8 +769,7 @@ uint8_t commandHelp(char *commandline, uint8_t port) {
 	UNUSED_VARIABLE(commandline);
 	uint8_t current_command;
 	send_string("\r\nCommands:\r\n", port);
-	for (current_command = 0; current_command < (sizeof(commands) / sizeof(command_entry));
-		 current_command++) {
+	for (current_command = 0; current_command < (sizeof(commands) / sizeof(command_entry)); current_command++) {
 		send_string("\t", port);
 		Term_Color_Cyan(port);
 		send_string((char *)commands[current_command].text, port);
@@ -811,8 +784,7 @@ uint8_t commandHelp(char *commandline, uint8_t port) {
 	}
 
 	send_string("\r\nParameters:\r\n", port);
-	for (current_command = 0; current_command < sizeof(tparameters) / sizeof(parameter_entry);
-		 current_command++) {
+	for (current_command = 0; current_command < sizeof(tparameters) / sizeof(parameter_entry); current_command++) {
 		send_string("\t", port);
 		Term_Color_Cyan(port);
 		send_string((char *)tparameters[current_command].name, port);
@@ -828,8 +800,7 @@ uint8_t commandHelp(char *commandline, uint8_t port) {
 	}
 
 	send_string("\r\nConfiguration:\r\n", port);
-	for (current_command = 0; current_command < sizeof(confparam) / sizeof(parameter_entry);
-		 current_command++) {
+	for (current_command = 0; current_command < sizeof(confparam) / sizeof(parameter_entry); current_command++) {
 		send_string("\t", port);
 		Term_Color_Cyan(port);
 		send_string((char *)confparam[current_command].name, port);
@@ -858,7 +829,7 @@ void send_char(uint8 c, uint8_t port) {
 			xQueueSend(qUSB_tx, &c, portMAX_DELAY);
 		break;
 	case SERIAL:
-		// UART_2_PutChar(c);
+		//UART_2_PutChar(c);
 		buf[0] = c;
 		buf[1] = '\0';
 		if (qUart_tx != NULL)
@@ -878,7 +849,7 @@ void send_string(char *data, uint8_t port) {
 		if (qUSB_tx != NULL) {
 
 			while ((*data) != '\0') {
-				// if(xQueueSendFromISR(qUSB_tx,data,NULL)) data++;
+				//if(xQueueSendFromISR(qUSB_tx,data,NULL)) data++;
 				if (xQueueSend(qUSB_tx, data, portMAX_DELAY))
 					data++;
 			}
@@ -888,7 +859,7 @@ void send_string(char *data, uint8_t port) {
 	case SERIAL:
 		if (qUart_tx != NULL) {
 			while ((*data) != '\0') {
-				// if(xQueueSendFromISR(qUart_tx,data,NULL)) data++;
+				//if(xQueueSendFromISR(qUart_tx,data,NULL)) data++;
 				if (xQueueSend(qUart_tx, data, portMAX_DELAY))
 					data++;
 			}
@@ -929,10 +900,8 @@ void send_buffer(uint8_t *data, uint16_t len, uint8_t port) {
 *********************************************/
 void nt_interpret(const char *text, uint8_t port) {
 	uint8_t current_command;
-	for (current_command = 0; current_command < (sizeof(commands) / sizeof(command_entry));
-		 current_command++) {
-		if (memcmp(text, commands[current_command].text, strlen(commands[current_command].text)) ==
-			0) {
+	for (current_command = 0; current_command < (sizeof(commands) / sizeof(command_entry)); current_command++) {
+		if (memcmp(text, commands[current_command].text, strlen(commands[current_command].text)) == 0) {
 			commands[current_command].commandFunction((char *)strchr(text, ' '), port);
 
 			return;
@@ -947,15 +916,29 @@ void nt_interpret(const char *text, uint8_t port) {
 	}
 }
 
-void Term_Erase_to_End_of_Line(void) { UART_2_PutString("\0x1B[K"); }
+void Term_Erase_to_End_of_Line(void) {
+	UART_2_PutString("\0x1B[K");
+}
 
-void Term_Erase_Screen(uint8_t port) { send_string("\033[2J\033[1;1H", port); }
+void Term_Erase_Screen(uint8_t port) {
+	send_string("\033[2J\033[1;1H", port);
+}
 
-void Term_Color_Green(uint8_t port) { send_string("\033[32m", port); }
-void Term_Color_Red(uint8_t port) { send_string("\033[31m", port); }
-void Term_Color_White(uint8_t port) { send_string("\033[37m", port); }
-void Term_Color_Cyan(uint8_t port) { send_string("\033[36m", port); }
-void Term_BGColor_Blue(uint8_t port) { send_string("\033[44m", port); }
+void Term_Color_Green(uint8_t port) {
+	send_string("\033[32m", port);
+}
+void Term_Color_Red(uint8_t port) {
+	send_string("\033[31m", port);
+}
+void Term_Color_White(uint8_t port) {
+	send_string("\033[37m", port);
+}
+void Term_Color_Cyan(uint8_t port) {
+	send_string("\033[36m", port);
+}
+void Term_BGColor_Blue(uint8_t port) {
+	send_string("\033[44m", port);
+}
 
 void Term_Move_Cursor(uint8_t row, uint8_t column, uint8_t port) {
 	char buffer[44];

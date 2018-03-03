@@ -2,7 +2,8 @@
 #define FIFO_H
 #include <stdint.h>
 
-typedef struct {
+typedef struct
+{
 	uint8_t volatile count;		 // # Zeichen im Puffer
 	uint8_t size;				 // Puffer-Größe
 	uint8_t *pread;				 // Lesezeiger
@@ -15,7 +16,8 @@ extern uint8_t fifo_put(fifo_t *, const uint8_t data);
 extern uint8_t fifo_get_wait(fifo_t *);
 extern int fifo_get_nowait(fifo_t *);
 
-static inline uint8_t _inline_fifo_put(fifo_t *f, const uint8_t data) {
+static inline uint8_t
+_inline_fifo_put(fifo_t *f, const uint8_t data) {
 	if (f->count >= f->size)
 		return 0;
 
@@ -38,7 +40,8 @@ static inline uint8_t _inline_fifo_put(fifo_t *f, const uint8_t data) {
 	return 1;
 }
 
-static inline uint8_t _inline_fifo_get(fifo_t *f) {
+static inline uint8_t
+_inline_fifo_get(fifo_t *f) {
 	uint8_t *pread = f->pread;
 	uint8_t data = *(pread++);
 	uint8_t read2end = f->read2end;

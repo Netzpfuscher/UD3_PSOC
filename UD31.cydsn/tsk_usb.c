@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2015, E2ForLife.com
  * All rights reserved.
- *
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
  *     * Neither the name of the E2ForLife.com nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -97,13 +97,11 @@ void tsk_usb_Task(void *pvParameters) {
 
 	for (;;) {
 		/* Handle enumeration of USB port */
-		if (USBMIDI_1_IsConfigurationChanged() !=
-			0u) /* Host could send double SET_INTERFACE request */
+		if (USBMIDI_1_IsConfigurationChanged() != 0u) /* Host could send double SET_INTERFACE request */
 		{
 			if (USBMIDI_1_GetConfiguration() != 0u) /* Init IN endpoints when device configured */
 			{
-				/* Enumeration is done, enable OUT endpoint for receive data from
-				 * Host */
+				/* Enumeration is done, enable OUT endpoint for receive data from Host */
 				USBMIDI_1_CDC_Init();
 				USBMIDI_1_MIDI_Init();
 			}
@@ -113,9 +111,9 @@ void tsk_usb_Task(void *pvParameters) {
 		 */
 		if (USBMIDI_1_GetConfiguration() != 0u) {
 /*
- * Process received data from the USB, and store it in to the
- * receiver message Q.
- */
+			 * Process received data from the USB, and store it in to the
+			 * receiver message Q.
+			 */
 
 #if (!USBMIDI_1_EP_MANAGEMENT_DMA_AUTO)
 			USBMIDI_1_MIDI_OUT_Service();
@@ -150,13 +148,12 @@ void tsk_usb_Task(void *pvParameters) {
 				/* Send data back to host */
 				USBMIDI_1_PutData(buffer, count);
 
-				/* If the last sent packet is exactly maximum packet size,
-		 *  it shall be followed by a zero-length packet to assure the
-		 *  end of segment is properly identified by the terminal.
-		 */
+				/* If the last sent packet is exactly maximum packet size, 
+            	 *  it shall be followed by a zero-length packet to assure the
+             	 *  end of segment is properly identified by the terminal.
+             	 */
 				if (count == tsk_usb_BUFFER_LEN) {
-					/* Wait till component is ready to send more data to the PC
-					 */
+					/* Wait till component is ready to send more data to the PC */
 					while (USBMIDI_1_CDCIsReady() == 0u) {
 						vTaskDelay(10 / portTICK_RATE_MS);
 					}

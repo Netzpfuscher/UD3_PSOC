@@ -59,7 +59,7 @@ xSemaphoreHandle tsk_fault_Mutex;
 /* `#START USER_TASK_LOCAL_CODE` */
 
 void handle_watchdog_reset(void) {
-	// for test use: set wd_kill = 1 to defeat the watchdog timeout
+	//for test use: set wd_kill = 1 to defeat the watchdog timeout
 	if (!confparam[CONF_WD].value) {
 		watchdog_reset_Control = 1;
 		watchdog_reset_Control = 0;
@@ -67,10 +67,9 @@ void handle_watchdog_reset(void) {
 }
 
 void handle_UVLO(void) {
-	// UVLO feedback via system_fault (LED2)
+	//UVLO feedback via system_fault (LED2)
 	telemetry.uvlo_stat = UVLO_status_Status;
-	if ((bus_command == BUS_COMMAND_FAULT) || (telemetry.uvlo_stat == 0) ||
-		(telemetry.bus_status == BUS_CHARGING)) {
+	if ((bus_command == BUS_COMMAND_FAULT) || (telemetry.uvlo_stat == 0) || (telemetry.bus_status == BUS_CHARGING)) {
 		system_fault_Control = 0;
 	} else {
 		system_fault_Control = 1;
@@ -116,7 +115,7 @@ void tsk_fault_Start(void) {
 	/*
 	 * Insert task global memeory initialization here. Since the OS does not
 	 * initialize ANY global memory, execute the initialization here to make
-	 * sure that your task data is properly
+	 * sure that your task data is properly 
 	 */
 	/* `#START TASK_GLOBAL_INIT` */
 
@@ -128,9 +127,9 @@ void tsk_fault_Start(void) {
 #endif
 
 		/*
-		* Create the task and then leave. When FreeRTOS starts up the scheduler
-		* will call the task procedure and start execution of the task.
-		*/
+	 	* Create the task and then leave. When FreeRTOS starts up the scheduler
+	 	* will call the task procedure and start execution of the task.
+	 	*/
 		xTaskCreate(tsk_fault_TaskProc, "Fault-Svc", 128, NULL, PRIO_FAULT, &tsk_fault_TaskHandle);
 		tsk_fault_initVar = 1;
 	}
