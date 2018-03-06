@@ -31,6 +31,12 @@
 
 #include <cytypes.h>
 #include <device.h>
+    
+/* RTOS includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
 #define tsk_usb_YES (1)
 #define tsk_usb_NO (0)

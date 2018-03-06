@@ -27,9 +27,11 @@
 
 #include "tsk_overlay.h"
 
+/* RTOS includes. */
 #include "FreeRTOS.h"
-#include "FreeRTOS_semphr.h"
-#include "FreeRTOS_task.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
 /* ------------------------------------------------------------------------ */
 /*

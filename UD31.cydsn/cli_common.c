@@ -76,7 +76,6 @@ uint8_t command_tr(char *commandline, uint8_t port);
 uint8_t command_udkill(char *commandline, uint8_t port);
 uint8_t command_eprom(char *commandline, uint8_t port);
 uint8_t command_status(char *commandline, uint8_t port);
-uint8_t command_window(char *commandline, uint8_t port);
 uint8_t command_cls(char *commandline, uint8_t port);
 uint8_t command_tune_p(char *commandline, uint8_t port);
 uint8_t command_tune_s(char *commandline, uint8_t port);
@@ -148,7 +147,6 @@ command_entry commands[] =
         {"kill"		        ,command_udkill     ,"Kills all UD Coils" },        
         {"eeprom"		    ,command_eprom      ,"Save/Load config [load/save]" },
         {"status"		    ,command_status     ,"Displays coil status" },
-        {"window"		    ,command_window     ,"Displays message window" },
         {"cls"		        ,command_cls        ,"Clear screen" },
         {"tune_p"	        ,command_tune_p     ,"Autotune Primary" },
         {"tune_s"	        ,command_tune_s     ,"Autotune Secondary" },
@@ -345,25 +343,6 @@ void Term_Box(uint8_t row1, uint8_t col1, uint8_t row2, uint8_t col2, uint8_t po
 	Term_Color_White(port);
 }
 
-uint8_t command_window(char *commandline, uint8_t port) {
-	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
-	{
-		Term_Color_Red(port);
-		send_string("Usage: window [string]\r\n", port);
-		Term_Color_White(port);
-		return 1;
-	}
-	send_string("\r\n", port);
-	Term_Save_Cursor(port);
-
-	uint8_t nchars = strlen(commandline);
-	Term_Box(5, 30, 7, 30 + nchars, port);
-	Term_Move_Cursor(6, 31, port);
-	send_string(commandline + 1, port);
-	Term_Restore_Cursor(port);
-	return 1;
-}
-
 uint8_t command_tr(char *commandline, uint8_t port) {
 
 	if (*commandline == 0x20 && commandline != 0)
@@ -449,7 +428,7 @@ uint8_t command_tasks(char *commandline, uint8_t port) {
 	send_string("********************************************\n\r", port);
 	send_string("Task          State   Prio    Stack    Num\n\r", port);
 	send_string("********************************************\n\r", port);
-	vTaskList(buff);
+//	vTaskList(buff);
 	send_string(buff, port);
 	send_string("*********************************************\n\r", port);
 	return 0;

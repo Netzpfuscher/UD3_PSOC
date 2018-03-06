@@ -22,6 +22,12 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/* RTOS includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+
 #include "DMA.h"
 #include "ZCDtoPWM.h"
 #include "charging.h"
@@ -40,7 +46,17 @@
 
 void vMainTask(void *pvParameters);
 
+/*
+ * Installs the RTOS interrupt handlers and starts the peripherals.
+ */
+static void prvHardwareSetup( void );
+
+
+
 int main() {
+    
+    prvHardwareSetup();
+    
 	system_fault_Control = 0; //this should suppress any start-up sparking until the system is ready
 	EEPROM_1_Start();
 	eprom_load();
@@ -69,11 +85,43 @@ int main() {
 	tsk_thermistor_Start(); //Reads thermistors
 	tsk_fault_Start();		//Handles fault conditions
 
-	FreeRTOS_Start();
-
+	vTaskStartScheduler();
+    
 	for (;;) {
 		//should never reach this point
 	}
 }
+
+void prvHardwareSetup( void )
+{
+/* Port layer functions that need to be copied into the vector table. */
+extern void xPortPendSVHandler( void );
+extern void xPortSysTickHandler( void );
+extern void vPortSVCHandler( void );
+extern cyisraddress CyRamVectors[];
+
+	/* Install the OS Interrupt Handlers. */
+	CyRamVectors[ 11 ] = ( cyisraddress ) vPortSVCHandler;
+	CyRamVectors[ 14 ] = ( cyisraddress ) xPortPendSVHandler;
+	CyRamVectors[ 15 ] = ( cyisraddress ) xPortSysTickHandler;
+
+	/* Start-up the peripherals. */
+
+
+}
+
+
+void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
+{
+	/* The stack space has been execeeded for a task, considering allocating more. */
+	taskDISABLE_INTERRUPTS();
+}/*---------------------------------------------------------------------------*/
+
+void vApplicationMallocFailedHook( void )
+{
+	/* The heap space has been execeeded. */
+	taskDISABLE_INTERRUPTS();
+}
+/*---------------------------------------------------------------------------*/
 
 /* [] END OF FILE */

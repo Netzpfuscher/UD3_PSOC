@@ -31,6 +31,12 @@
  */
 /* `#START USER_TYPES_AND_DEFINES` */
 #include <device.h>
+    
+    /* RTOS includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
 xQueueHandle qMIDI_rx;
 xSemaphoreHandle new_midi_data;

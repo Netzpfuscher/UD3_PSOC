@@ -27,9 +27,11 @@
 
 #include "tsk_cli.h"
 
+/* RTOS includes. */
 #include "FreeRTOS.h"
-#include "FreeRTOS_semphr.h"
-#include "FreeRTOS_task.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
 xTaskHandle UART_Terminal_TaskHandle;
 xTaskHandle USB_Terminal_TaskHandle;

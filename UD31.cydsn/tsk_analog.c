@@ -27,9 +27,11 @@
 
 #include "tsk_analog.h"
 
+/* RTOS includes. */
 #include "FreeRTOS.h"
-#include "FreeRTOS_semphr.h"
-#include "FreeRTOS_task.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
 
 xTaskHandle tsk_analog_TaskHandle;
 uint8 tsk_analog_initVar = 0u;
