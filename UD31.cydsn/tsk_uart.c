@@ -27,10 +27,6 @@
 
 #include "tsk_uart.h"
 
-#include "FreeRTOS.h"
-#include "FreeRTOS_semphr.h"
-#include "FreeRTOS_task.h"
-
 xTaskHandle tsk_uart_TaskHandle;
 uint8 tsk_uart_initVar = 0u;
 

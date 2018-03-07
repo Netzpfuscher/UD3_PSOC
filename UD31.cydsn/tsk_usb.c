@@ -35,10 +35,6 @@
 #include "tsk_priority.h"
 #include "tsk_usb.h"
 
-#include "FreeRTOS.h"
-#include "FreeRTOS_queue.h"
-#include "FreeRTOS_semphr.h"
-#include "FreeRTOS_task.h"
 
 /* ======================================================================== */
 

@@ -29,10 +29,6 @@
 
 #include "fifo.h"
 
-#include "FreeRTOS.h"
-#include "FreeRTOS_semphr.h"
-#include "FreeRTOS_task.h"
-
 xTaskHandle tsk_midi_TaskHandle;
 uint8 tsk_midi_initVar = 0u;
 

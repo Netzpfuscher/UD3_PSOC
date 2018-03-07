@@ -49,13 +49,13 @@ void vMainTask(void *pvParameters);
 /*
  * Installs the RTOS interrupt handlers and starts the peripherals.
  */
-static void prvHardwareSetup( void );
+static void prvFreeRTOSSetup( void );
 
 
 
 int main() {
     
-    prvHardwareSetup();
+    prvFreeRTOSSetup();
     
 	system_fault_Control = 0; //this should suppress any start-up sparking until the system is ready
 	EEPROM_1_Start();
@@ -92,7 +92,7 @@ int main() {
 	}
 }
 
-void prvHardwareSetup( void )
+void prvFreeRTOSSetup( void )
 {
 /* Port layer functions that need to be copied into the vector table. */
 extern void xPortPendSVHandler( void );
@@ -106,7 +106,6 @@ extern cyisraddress CyRamVectors[];
 	CyRamVectors[ 15 ] = ( cyisraddress ) xPortSysTickHandler;
 
 	/* Start-up the peripherals. */
-
 
 }
 

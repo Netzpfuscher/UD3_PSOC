@@ -39,9 +39,6 @@
 #include "cyapicallbacks.h"
 #include <cytypes.h>
 
-#include "FreeRTOS.h"
-#include "FreeRTOS_semphr.h"
-#include "FreeRTOS_task.h"
 
 #include "tsk_analog.h"
 #include "tsk_overlay.h"
