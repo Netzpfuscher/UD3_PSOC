@@ -25,6 +25,8 @@
 #ifndef TELEMETRY_H
 #define TELEMETRY_H
 
+#include <device.h>
+    
 #define BUS_OFF 0
 #define BUS_CHARGING 1
 #define BUS_READY 2
@@ -48,6 +50,7 @@ typedef struct
 	uint16 batt_i;		//battery current in centiamps
 	uint8 uvlo_stat;	//uvlo status
 	uint16_t primary_i;
+    uint8_t midi_voices;
 } telemetry_struct;
 telemetry_struct telemetry;
 

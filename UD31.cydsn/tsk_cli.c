@@ -112,9 +112,8 @@ static int usb_read(char *buf, int cnt, void *extobj) {
 
 static int serial_write(const char *buf, int cnt, void *extobj) {
 	UNUSED_VARIABLE(extobj);
-	//UART_2_PutArray((uint8*)buf,cnt);
 
-	for (int i = 0; i < cnt; i++) {
+    for (int i = 0; i < cnt; i++) {
 		xQueueSend(qUart_tx, &buf[i], portMAX_DELAY);
 	}
 
@@ -125,13 +124,10 @@ static int usb_write(const char *buf, int cnt, void *extobj) {
 	UNUSED_VARIABLE(extobj);
 	if (0u != USBMIDI_1_GetConfiguration()) {
 
-		//        while (0u == USBMIDI_1_CDCIsReady()){}
-		//        USBMIDI_1_PutData((uint8*)buf,cnt);
-
 		for (int i = 0; i < cnt; i++) {
 			xQueueSend(qUSB_tx, &buf[i], portMAX_DELAY);
 		}
-	};
+	}
 
 	return cnt;
 }
@@ -161,19 +157,14 @@ uint8_t handle_uart_terminal(ntshell_t *ptr) {
 		blink--;
 	if (blink == 1)
 		rx_blink_Control = 1;
-	//if(UART_2_GetRxBufferSize()==0) return 0;
 
 	if (xQueueReceive(qUart_rx, &c, portMAX_DELAY)) {
 		if (xSemaphoreTake(block_term[SERIAL], portMAX_DELAY)) {
-			;
-			//c = UART_2_GetChar();
 			rx_blink_Control = 0;
 			blink = 240;
 			ntshell_execute_nb(ptr, c);
 			xSemaphoreGive(block_term[SERIAL]);
-		} else {
-			send_string("cannot\r\n", SERIAL);
-		}
+		} 
 	}
 
 	return 0;
@@ -186,10 +177,8 @@ uint8_t handle_USB_terminal(ntshell_t *ptr) {
 		blink--;
 	if (blink == 1)
 		rx_blink_Control = 1;
-	//if(UART_2_GetRxBufferSize()==0) return 0;
 	if (xQueueReceive(qUSB_rx, &c, portMAX_DELAY)) {
 		xSemaphoreTake(block_term[USB], portMAX_DELAY);
-		//c = UART_2_GetChar();
 		rx_blink_Control = 0;
 		blink = 240;
 		ntshell_execute_nb(ptr, c);
@@ -245,10 +234,9 @@ void tsk_cli_TaskProc(void *pvParameters) {
 
 		//vTaskDelay( 20/ portTICK_PERIOD_MS);
 	}
-	send_string("CLI-Task died", (uint32_t)pvParameters);
 }
 /* ------------------------------------------------------------------------ */
-void cli_Start(void) {
+void tsk_cli_Start(void) {
 /*
 	 * Insert task global memeory initialization here. Since the OS does not
 	 * initialize ANY global memory, execute the initialization here to make
@@ -257,9 +245,6 @@ void cli_Start(void) {
 /* `#START TASK_GLOBAL_INIT` */
 
 /* `#END` */
-#if defined(cli_START_CALLBACK)
-	cli_Start_Callback();
-#endif
 
 	if (tsk_cli_initVar != 1) {
 #if (1 == 1)

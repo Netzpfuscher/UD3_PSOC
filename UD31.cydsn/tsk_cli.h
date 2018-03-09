@@ -33,7 +33,7 @@
 
 /* `#END` */
 
-void cli_Start(void);
+void tsk_cli_Start(void);
 
 /*
  * Add user function prototypes in the below merge region to add user

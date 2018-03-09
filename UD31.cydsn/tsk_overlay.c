@@ -65,7 +65,7 @@ void show_overlay(uint8_t port) {
 	uint8_t row_pos = 1;
 	uint8_t col_pos = 90;
 	//Term_Erase_Screen(port);
-	Term_Box(row_pos, col_pos, row_pos + 9, col_pos + 25, port);
+	Term_Box(row_pos, col_pos, row_pos + 10, col_pos + 25, port);
 	Term_Move_Cursor(row_pos + 1, col_pos + 1, port);
 	sprintf(buffer, "Bus Voltage:       %4iV", telemetry.bus_v);
 	send_string(buffer, port);
@@ -108,6 +108,10 @@ void show_overlay(uint8_t port) {
 	Term_Move_Cursor(row_pos + 8, col_pos + 1, port);
 	sprintf(buffer, "Primary Current:   %4iA", CT1_Get_Current(CT_PRIMARY));
 	send_string(buffer, port);
+    
+    Term_Move_Cursor(row_pos + 9, col_pos + 1, port);
+	sprintf(buffer, "MIDI voices:         %1i/4", telemetry.midi_voices);
+	send_string(buffer, port);
 
 	Term_Restore_Cursor(port);
 	send_string("\033[?25h", port);
@@ -144,6 +148,6 @@ void tsk_overlay_TaskProc(void *pvParameters) {
 
 		/* `#END` */
 
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
+		vTaskDelay(300 / portTICK_PERIOD_MS);
 	}
 }

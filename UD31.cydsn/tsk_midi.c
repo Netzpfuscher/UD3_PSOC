@@ -46,6 +46,7 @@ xSemaphoreHandle tsk_midi_Mutex;
 #include "interrupter.h"
 #include "tsk_midi.h"
 #include "tsk_priority.h"
+#include "telemetry.h"
 #include <device.h>
 #include <math.h>
 #include <stdio.h>
@@ -367,11 +368,13 @@ void process(NOTE *v, CHANNEL channel[], MIDICH midich[]) {
 void reflect(PORT port[], CHANNEL channel[], MIDICH midich[]) {
 	uint8_t ch;
 	uint8_t mch;
+    telemetry.midi_voices =0;
 	// Reflect the status of the updated tone generator channel & MIDI channel on the port
 	for (ch = 0; ch < N_CHANNEL; ch++) {
 		mch = channel[ch].midich;
 		if (channel[ch].updated || midich[mch].updated) {
 			if (channel[ch].volume > 0) {
+                telemetry.midi_voices++;
 				port[ch].halfcount = FREQ_HALFCOUNT(MIDITONENUM_FREQ(channel[ch].miditone + ((float)midich[mch].pitchbend * midich[mch].bendrange) / PITCHBEND_DIVIDER));
 				if (ch < N_DISPCHANNEL)
 					channel[ch].displayed = 1; // Re-display required

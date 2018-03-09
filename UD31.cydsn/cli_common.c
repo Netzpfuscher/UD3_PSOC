@@ -421,14 +421,25 @@ uint8_t command_tune_s(char *commandline, uint8_t port) {
 }
 
 uint8_t command_tasks(char *commandline, uint8_t port) {
-	static char buff[500];
-	send_string("********************************************\n\r", port);
-	send_string("Task          State   Prio    Stack    Num\n\r", port);
-	send_string("********************************************\n\r", port);
-//	vTaskList(buff);
-	send_string(buff, port);
-	send_string("*********************************************\n\r", port);
-	return 0;
+    #if configUSE_STATS_FORMATTING_FUNCTIONS && configUSE_TRACE_FACILITY
+        
+	    static char buff[600];
+	    send_string("********************************************\n\r", port);
+	    send_string("Task          State   Prio    Stack    Num\n\r", port);
+	    send_string("********************************************\n\r", port);
+	    vTaskList(buff);
+	    send_string(buff, port);
+	    send_string("*********************************************\n\r", port);
+	    return 0;
+
+    #endif
+    
+    #if !configUSE_STATS_FORMATTING_FUNCTIONS && !configUSE_TRACE_FACILITY
+	    send_string("Taskinfo not active, activate it in FreeRTOSConfig.h\n\r", port);
+        return 0;
+	#endif
+    
+	
 }
 
 uint8_t commandGet(char *commandline, uint8_t port) {

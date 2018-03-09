@@ -23,6 +23,9 @@
 */
 
 /* RTOS includes. */
+
+
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -80,7 +83,7 @@ int main() {
 	tsk_uart_Start(); //Handles UART-Hardware and queues
 	tsk_usb_Start();  //Handles USB-Hardware and queues
 	tsk_midi_Start();
-	cli_Start();			//Commandline interface
+	tsk_cli_Start();			//Commandline interface
 	tsk_analog_Start();		//Reads bus voltage and currents
 	tsk_thermistor_Start(); //Reads thermistors
 	tsk_fault_Start();		//Handles fault conditions
