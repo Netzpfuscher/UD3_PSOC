@@ -83,7 +83,7 @@ uint8_t command_bus(char *commandline, uint8_t port);
 
 void nt_interpret(const char *text, uint8_t port);
 
-uint8_t kill_msg[3] = {0xb0, 0x77, 0x00};
+const uint8_t kill_msg[3] = {0xb0, 0x77, 0x00};
 
 uint8_t tr_running = 0;
 
@@ -229,9 +229,9 @@ uint8_t updateConfigFunction(int newValue, uint8_t index) {
 
 uint8_t command_bus(char *commandline, uint8_t port) {
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++;						   //Leerzeichen überspringen
-	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
-	{
+		commandline++;						   //Skip space
+	if (*commandline == 0 || commandline == 0) { //No param --> show help text
+	
 		Term_Color_Red(port);
 		send_string("Usage: bus [on|off]\r\n", port);
 		Term_Color_White(port);
@@ -254,10 +254,10 @@ uint8_t command_status(char *commandline, uint8_t port) {
 	static xTaskHandle overlay_Serial_TaskHandle;
 	static xTaskHandle overlay_USB_TaskHandle;
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++; //Leerzeichen überspringen
+		commandline++; //skip space
 
-	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
-	{
+	if (*commandline == 0 || commandline == 0) { //no param --> show help text
+	
 		Term_Color_Red(port);
 		send_string("Usage: status [start|stop]\r\n", port);
 		Term_Color_White(port);
@@ -277,7 +277,6 @@ uint8_t command_status(char *commandline, uint8_t port) {
 			}
 			break;
 		}
-		//ntshell_set_scroll_region(&ntserial,20,40);
 	}
 	if (strcmp(commandline, "stop") == 0) {
 		switch (port) {
@@ -343,10 +342,9 @@ void Term_Box(uint8_t row1, uint8_t col1, uint8_t row2, uint8_t col2, uint8_t po
 uint8_t command_tr(char *commandline, uint8_t port) {
 
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++; //Leerzeichen überspringen
+		commandline++; //skip space
 
-	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
-	{
+	if (*commandline == 0 || commandline == 0) { //no param --> show help text
 		Term_Color_Red(port);
 		send_string("Usage: tr [start|stop]\r\n", port);
 		Term_Color_White(port);
@@ -374,10 +372,9 @@ uint8_t command_tr(char *commandline, uint8_t port) {
 uint8_t command_qcw(char *commandline, uint8_t port) {
 
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++; //Leerzeichen überspringen
+		commandline++; //skip space
 
-	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
-	{
+	if (*commandline == 0 || commandline == 0) { //no param --> show help text
 		Term_Color_Red(port);
 		send_string("Usage: qcw [start|stop]\r\n", port);
 		Term_Color_White(port);
@@ -447,9 +444,9 @@ uint8_t commandGet(char *commandline, uint8_t port) {
 	uint8_t current_parameter;
 
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++; //Leerzeichen überspringen
+		commandline++; //skip space
 
-	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
+	if (*commandline == 0 || commandline == 0) //no param --> show help text
 	{
 		send_string("\tParameter\t\t| Value\t\t| Text\r\n", port);
 		for (current_parameter = 0; current_parameter < sizeof(tparameters) / sizeof(parameter_entry); current_parameter++) {
@@ -482,9 +479,9 @@ uint8_t commandGetConf(char *commandline, uint8_t port) {
 	uint8_t current_parameter;
 
 	if (*commandline == 0x20 && commandline != 0)
-		commandline++; //Leerzeichen überspringen
+		commandline++; //skip space
 
-	if (*commandline == 0 || commandline == 0) //Kein Parametername --> Liste anzeigen
+	if (*commandline == 0 || commandline == 0) //no param --> show help text
 	{
 		send_string("\tParameter\t\t| Value\t\t| Text\r\n", port);
 		for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry); current_parameter++) {
@@ -535,7 +532,7 @@ uint8_t commandSet(char *commandline, uint8_t port) {
 		return 0;
 	}
 
-	//Trennzeichen gefunden und durch \0 ersetzen, um Strings zu trennen
+	//found space, replace with \0 to seperate string
 	*param_value = 0;
 	param_value++;
 
@@ -549,7 +546,7 @@ uint8_t commandSet(char *commandline, uint8_t port) {
 	uint8_t current_parameter;
 	for (current_parameter = 0; current_parameter < sizeof(tparameters) / sizeof(parameter_entry); current_parameter++) {
 		if (strcmp(commandline, tparameters[current_parameter].name) == 0) {
-			//Parameter-Name gefunden:
+			//parameter name found:
 			int new_value;
 			new_value = atoi(param_value);
 
@@ -562,7 +559,7 @@ uint8_t commandSet(char *commandline, uint8_t port) {
 			}
 
 			if (tparameters[current_parameter].updateFunction(new_value, current_parameter)) {
-				tparameters[current_parameter].value = new_value; //Wert übernehmen
+				tparameters[current_parameter].value = new_value; //save value
 				Term_Color_Green(port);
 				send_string("OK\r\n", port);
 				Term_Color_White(port);
@@ -604,7 +601,7 @@ uint8_t commandSetConf(char *commandline, uint8_t port) {
 		return 0;
 	}
 
-	//Trennzeichen gefunden und durch \0 ersetzen, um Strings zu trennen
+	//found space, replace with \0 to seperate string
 	*param_value = 0;
 	param_value++;
 
@@ -618,7 +615,7 @@ uint8_t commandSetConf(char *commandline, uint8_t port) {
 	uint8_t current_parameter;
 	for (current_parameter = 0; current_parameter < sizeof(confparam) / sizeof(parameter_entry); current_parameter++) {
 		if (strcmp(commandline, confparam[current_parameter].name) == 0) {
-			//Parameter-Name gefunden:
+			//parameter name found:
 			int new_value;
 			new_value = atoi(param_value);
 
@@ -631,7 +628,7 @@ uint8_t commandSetConf(char *commandline, uint8_t port) {
 			}
 
 			if (confparam[current_parameter].updateFunction(new_value, current_parameter)) {
-				confparam[current_parameter].value = new_value; //Wert übernehmen
+				confparam[current_parameter].value = new_value; //save value
 				Term_Color_Green(port);
 				send_string("OK\r\n", port);
 				Term_Color_White(port);
@@ -689,7 +686,7 @@ uint8_t command_eprom(char *commandline, uint8_t port) {
 	if (*commandline == 0x20 && commandline != 0)
 		commandline++; //skip space
 
-	if (*commandline == 0 || commandline == 0) //no param show list
+	if (*commandline == 0 || commandline == 0) //no param --> show help text
 	{
 		Term_Color_Red(port);
 		send_string("Usage: eprom [load|save]\r\n", port);
@@ -732,7 +729,6 @@ uint8_t command_eprom(char *commandline, uint8_t port) {
 		Term_Color_Green(port);
 		send_string(buffer, port);
 		Term_Color_White(port);
-		//send_string("\r\nWrite EEPROM OK\r\n", port);
 		system_fault_Control = sfflag;
 		return 0;
 	}
@@ -816,12 +812,10 @@ void send_char(uint8 c, uint8_t port) {
 			xQueueSend(qUSB_tx, &c, portMAX_DELAY);
 		break;
 	case SERIAL:
-		//UART_2_PutChar(c);
 		buf[0] = c;
 		buf[1] = '\0';
 		if (qUart_tx != NULL)
 			xQueueSend(qUart_tx, buf, portMAX_DELAY);
-
 		break;
 	}
 }
@@ -836,7 +830,6 @@ void send_string(char *data, uint8_t port) {
 		if (qUSB_tx != NULL) {
 
 			while ((*data) != '\0') {
-				//if(xQueueSendFromISR(qUSB_tx,data,NULL)) data++;
 				if (xQueueSend(qUSB_tx, data, portMAX_DELAY))
 					data++;
 			}
@@ -846,7 +839,6 @@ void send_string(char *data, uint8_t port) {
 	case SERIAL:
 		if (qUart_tx != NULL) {
 			while ((*data) != '\0') {
-				//if(xQueueSendFromISR(qUart_tx,data,NULL)) data++;
 				if (xQueueSend(qUart_tx, data, portMAX_DELAY))
 					data++;
 			}

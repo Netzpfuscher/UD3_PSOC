@@ -27,8 +27,7 @@
 
 #include <device.h>
 
-#define CPU_CLK_PERIOD 15.6325
-#define CPU_CLK_FREQ 64000000
+#define CPU_CLK_PERIOD 1000.0/BCLK__BUS_CLK__MHZ  
 #define DAC_VOLTS_PER_STEP 0.016
 #define R_BURDEN 3.3
 

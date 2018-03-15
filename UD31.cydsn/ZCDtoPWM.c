@@ -117,7 +117,7 @@ void configure_ZCD_to_PWM(void) {
 	params.lead_time = round(lead_time_temp);
 
 	//calculate starting period
-	pwm_start_prd_temp = CPU_CLK_FREQ / (confparam[CONF_START_FREQ].value * 200); //why 200? well 2 because its half-periods, and 100 because frequency is in hz*100
+	pwm_start_prd_temp = BCLK__BUS_CLK__HZ / (confparam[CONF_START_FREQ].value * 200); //why 200? well 2 because its half-periods, and 100 because frequency is in hz*100
 	params.pwm_top = round(pwm_start_prd_temp * 2);								  //top value for FB capture and pwm generators to avoid ULF crap
 	params.pwma_start_prd = params.pwm_top - params.lead_time;
 	params.pwma_start_cmp = params.pwm_top - pwm_start_prd_temp + 4; //untested, was just 4;
@@ -149,16 +149,12 @@ void configure_ZCD_to_PWM(void) {
 	ramp.modulation_value_previous = 0;
 
 	//prime the feedback filter with fake values so that the first time we use it, its not absolutely garbage
-	uint8 z;
-	for (z = 0; z < 5; z++) {
+	for (uint8_t z = 0; z < 5; z++) {
 		FB_Filter_Write24(FB_Filter_CHANNEL_A, params.pwm_top - round(pwm_start_prd_temp));
-		uint16 wait = 0;
-		while (wait < 255)
-			wait++;
+        CyDelayUs(4);
 	}
 
 	//set reference voltage for zero current detector comparators
-	ZCDref_Data = 25;
 	ZCDref_Data = 25;
 }
 
