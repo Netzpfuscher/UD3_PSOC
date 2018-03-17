@@ -145,12 +145,7 @@ int main(void) {
 
 			switch (mnu) {
 			case 1:
-				UART_1_PutString("\r\n");
-				CyDelay(2);
-				UART_1_PutString("kill");
-				CyDelay(2);
-				UART_1_PutString("\r\n");
-
+				UART_1_PutString("\r\nkill\r\n");
 				break;
 			case 2:
 				if (watchdog == 0) {

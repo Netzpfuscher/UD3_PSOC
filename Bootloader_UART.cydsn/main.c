@@ -83,6 +83,8 @@
 ***************************************************************************** */
 
 #include <project.h>
+#include "Bootloader.h"
+#include "UART.h"
 
 void main()
 {
