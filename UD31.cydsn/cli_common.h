@@ -29,6 +29,7 @@
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
+#include "timers.h"
 
 struct parameter_entry_struct {
 	const char *name;
@@ -49,6 +50,7 @@ typedef struct parameter_entry_struct parameter_entry;
 #define PARAM_TUNE_DELAY 5
 #define PARAM_OFFTIME 6
 #define PARAM_QCW_RAMP 7
+#define PARAM_QCW_REPEAT 8
 
 #define CONF_WD 0
 #define CONF_MAX_TR_PW 1

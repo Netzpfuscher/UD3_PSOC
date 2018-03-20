@@ -40,11 +40,13 @@
 #include <cytypes.h>
 
 
+
 #include "tsk_analog.h"
 #include "tsk_overlay.h"
 #include "tsk_priority.h"
 #include "tsk_uart.h"
 #include "tsk_usb.h"
+#include "tsk_qcw.h"
 
 #define UNUSED_VARIABLE(N) \
 	do {                   \
@@ -86,6 +88,7 @@ void nt_interpret(const char *text, uint8_t port);
 const uint8_t kill_msg[3] = {0xb0, 0x77, 0x00};
 
 uint8_t tr_running = 0;
+TimerHandle_t xQCW_Timer;
 
 // clang-format off
 parameter_entry volatile tparameters[] = {
@@ -98,6 +101,7 @@ parameter_entry volatile tparameters[] = {
     { "tune_delay"      , 50	, 1		,200	, updateTuneFunction    ,"Tune delay"},
     { "offtime"         , 2  	, 2		,250	, updateOfftimeFunction ,"Offtime for MIDI"},
     { "qcw_ramp"        , 2  	, 1		,10   	, updateDefaultFunction ,"QCW Ramp Inc/93us"},
+    { "qcw_repeat"      , 500  	, 0		,1000  	, updateDefaultFunction ,"QCW pulse repeat time [ms] <100=single shot"},
  	//
 };
 
@@ -368,6 +372,15 @@ uint8_t command_tr(char *commandline, uint8_t port) {
 	}
 	return 1;
 }
+void vQCW_Timer_Callback(TimerHandle_t xTimer){
+    if(!qcw_reg){
+         	ramp.modulation_value = 20;
+            qcw_reg = 1;
+		    ramp_control(); 
+    }
+    if(tparameters[PARAM_QCW_REPEAT].value<100) tparameters[PARAM_QCW_REPEAT].value = 100;
+    xTimerChangePeriod( xTimer, tparameters[PARAM_QCW_REPEAT].value / portTICK_PERIOD_MS, 0 );                                                   
+}
 
 uint8_t command_qcw(char *commandline, uint8_t port) {
 
@@ -380,17 +393,38 @@ uint8_t command_qcw(char *commandline, uint8_t port) {
 		Term_Color_White(port);
 		return 1;
 	}
-
+    
 	if (strcmp(commandline, "start") == 0) {
-		qcw_reg = 1;
-		ramp.modulation_value = 20;
-		ramp_control();
-		send_string("QCW Enabled\r\n", port);
+        if(tparameters[PARAM_QCW_REPEAT].value>99){
+            if(xQCW_Timer==NULL){
+                xQCW_Timer = xTimerCreate("QCW-Tmr", tparameters[PARAM_QCW_REPEAT].value / portTICK_PERIOD_MS, pdFALSE,(void * ) 0, vQCW_Timer_Callback);
+                if(xQCW_Timer != NULL){
+                    xTimerStart(xQCW_Timer, 0);
+                    send_string("QCW Enabled\r\n", port);
+                }else{
+                    send_string("Cannot create QCW Timer\r\n", port);
+                }
+            }
+        }else{
+		    ramp.modulation_value = 20;
+            qcw_reg = 1;
+		    ramp_control();
+            send_string("QCW single shot\r\n", port);
+        }
+		
 		return 0;
 	}
 	if (strcmp(commandline, "stop") == 0) {
-		QCW_enable_Control = 0;
-		send_string("\r\nQCW Disabled\r\n", port);
+        if (xQCW_Timer != NULL) {
+				if(xTimerDelete(xQCW_Timer, 200 / portTICK_PERIOD_MS) != pdFALSE){
+				    xQCW_Timer = NULL;
+                } else {
+                    send_string("Cannot delete QCW Timer\r\n", port);
+                }
+		}
+        QCW_enable_Control = 0;
+        qcw_reg = 0;
+		send_string("QCW Disabled\r\n", port);
 		return 0;
 	}
 	return 1;
@@ -399,6 +433,13 @@ uint8_t command_qcw(char *commandline, uint8_t port) {
 uint8_t command_udkill(char *commandline, uint8_t port) {
 	USBMIDI_1_callbackLocalMidiEvent(0, kill_msg);
 	bus_command = BUS_COMMAND_OFF;
+    
+    if (xQCW_Timer != NULL) {
+		if(xTimerDelete(xQCW_Timer, 200 / portTICK_PERIOD_MS) != pdFALSE){
+	        xQCW_Timer = NULL;
+        }
+	}
+    
 	interrupter1_control_Control = 0;
 	QCW_enable_Control = 0;
 	Term_Color_Green(port);
@@ -418,15 +459,21 @@ uint8_t command_tune_s(char *commandline, uint8_t port) {
 }
 
 uint8_t command_tasks(char *commandline, uint8_t port) {
-    #if configUSE_STATS_FORMATTING_FUNCTIONS && configUSE_TRACE_FACILITY
+    #if configUSE_STATS_FORMATTING_FUNCTIONS && configUSE_TRACE_FACILITY && configGENERATE_RUN_TIME_STATS
         
 	    static char buff[600];
-	    send_string("********************************************\n\r", port);
-	    send_string("Task          State   Prio    Stack    Num\n\r", port);
-	    send_string("********************************************\n\r", port);
+	    send_string("**********************************************\n\r", port);
+	    send_string("Task            State   Prio    Stack    Num\n\r", port);
+	    send_string("**********************************************\n\r", port);
 	    vTaskList(buff);
 	    send_string(buff, port);
-	    send_string("*********************************************\n\r", port);
+	    send_string("**********************************************\n\r\n\r", port);
+        send_string("**********************************************\n\r", port);
+	    send_string("Task            Abs time        % time\n\r", port);
+	    send_string("**********************************************\n\r", port);
+        vTaskGetRunTimeStats( buff );
+        send_string(buff, port);
+        send_string("**********************************************\n\r", port);
 	    return 0;
 
     #endif

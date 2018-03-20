@@ -126,4 +126,8 @@ void vApplicationMallocFailedHook( void )
 }
 /*---------------------------------------------------------------------------*/
 
+void vConfigureTimerForRunTimeStats(void){
+    
+}
+
 /* [] END OF FILE */

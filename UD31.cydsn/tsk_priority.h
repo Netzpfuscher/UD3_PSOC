@@ -30,3 +30,4 @@
 #define PRIO_USB 3
 #define PRIO_FAULT 3
 #define PRIO_MIDI 2
+#define PRIO_QCW 3

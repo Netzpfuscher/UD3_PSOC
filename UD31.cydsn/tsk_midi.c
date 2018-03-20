@@ -179,8 +179,6 @@ CY_ISR(isr_midi) {
 	}
 
 	if (qcw_reg) {
-		watchdog_reset_Control = 1;
-		watchdog_reset_Control = 0;
 		if ((ramp.modulation_value < 255) && (ramp.modulation_value > 0)) {
 			ramp.modulation_value += tparameters[PARAM_QCW_RAMP].value;
 			if (ramp.modulation_value > 255)
@@ -372,9 +370,9 @@ void reflect(PORT port[], CHANNEL channel[], MIDICH midich[]) {
 	// Reflect the status of the updated tone generator channel & MIDI channel on the port
 	for (ch = 0; ch < N_CHANNEL; ch++) {
 		mch = channel[ch].midich;
+        if (channel[ch].volume > 0) telemetry.midi_voices++;
 		if (channel[ch].updated || midich[mch].updated) {
 			if (channel[ch].volume > 0) {
-                telemetry.midi_voices++;
 				port[ch].halfcount = FREQ_HALFCOUNT(MIDITONENUM_FREQ(channel[ch].miditone + ((float)midich[mch].pitchbend * midich[mch].bendrange) / PITCHBEND_DIVIDER));
 				if (ch < N_DISPCHANNEL)
 					channel[ch].displayed = 1; // Re-display required

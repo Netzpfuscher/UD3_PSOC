@@ -148,6 +148,6 @@ void tsk_overlay_TaskProc(void *pvParameters) {
 
 		/* `#END` */
 
-		vTaskDelay(300 / portTICK_PERIOD_MS);
+		vTaskDelay(500 / portTICK_PERIOD_MS);
 	}
 }
