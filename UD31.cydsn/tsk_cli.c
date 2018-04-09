@@ -85,6 +85,7 @@ void initialize_cli(ntshell_t *ptr, uint8_t port) {
 	case SERIAL:
 		UART_2_Start();
 		ntshell_init(ptr, serial_read, serial_write, serial_callback, extobjt);
+        command_cls("", SERIAL);
 		break;
 	case USB:
 		USBMIDI_1_Start(0, USBMIDI_1_5V_OPERATION);
@@ -93,7 +94,6 @@ void initialize_cli(ntshell_t *ptr, uint8_t port) {
 	default:
 		break;
 	}
-
 	ntshell_set_prompt(ptr, ":>");
 	ntshell_show_promt(ptr);
 }

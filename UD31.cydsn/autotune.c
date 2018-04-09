@@ -53,8 +53,8 @@ void run_adc_sweep(uint16_t F_min, uint16_t F_max, uint16_t pulsewidth, uint8_t 
 		return;
 	}
 	//store the original setting, restore it after the sweep
-	original_freq = confparam[CONF_START_FREQ].value;
-	original_lock_cycles = confparam[CONF_START_CYCLES].value;
+	original_freq = configuration.start_freq;
+	original_lock_cycles = configuration.start_cycles;
 
 	//max_response = 0;
 	for (f = 0; f < 128; f++) {
@@ -68,11 +68,11 @@ void run_adc_sweep(uint16_t F_min, uint16_t F_max, uint16_t pulsewidth, uint8_t 
 		//this generates the requested trial frequency for the table entry, starting at Fmin and working our way up to Fmax
 		freq_response[f][FREQ] = (((F_max - F_min) * (f + 1)) >> 7) + F_min;
 
-		confparam[CONF_START_FREQ].value = freq_response[f][FREQ];
-		confparam[CONF_START_CYCLES].value = 120;
+		configuration.start_freq = freq_response[f][FREQ];
+		configuration.start_cycles = 120;
 		configure_ZCD_to_PWM();
 
-		for (n = 0; n < confparam[CONF_AUTOTUNE_SAMPLES].value; n++) {
+		for (n = 0; n < configuration.autotune_s; n++) {
 
 			//command a one shot
 
@@ -82,15 +82,15 @@ void run_adc_sweep(uint16_t F_min, uint16_t F_max, uint16_t pulsewidth, uint8_t 
 
 			current_buffer += CT1_Get_Current_f(channel);
 		}
-		freq_response[f][CURR] = round(current_buffer / (float)confparam[CONF_AUTOTUNE_SAMPLES].value * 10);
+		freq_response[f][CURR] = round(current_buffer / (float)configuration.autotune_s * 10);
 		sprintf(buffer, "Frequency: %i00Hz Current: %4i,%iA     \r", freq_response[f][FREQ], freq_response[f][CURR] / 10, freq_response[f][CURR] % 10);
 		send_string(buffer, port);
 	}
 	send_string("\r\n", port);
 
 	//restore original frequency
-	confparam[CONF_START_FREQ].value = original_freq;
-	confparam[CONF_START_CYCLES].value = original_lock_cycles;
+	configuration.start_freq = original_freq;
+	configuration.start_cycles = original_lock_cycles;
 	configure_ZCD_to_PWM();
 
 	CT_MUX_Select(CT_PRIMARY);

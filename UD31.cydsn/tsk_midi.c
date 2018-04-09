@@ -175,12 +175,12 @@ CY_ISR(isr_midi) {
 	int16_t temp_pulse;
 	temp_pulse = fifo_get_nowait(&pulse_fifo);
 	if (temp_pulse != -1) {
-		interrupter_oneshot(tparameters[PARAM_PW].value, temp_pulse);
+		interrupter_oneshot(param.pw, temp_pulse);
 	}
 
 	if (qcw_reg) {
 		if ((ramp.modulation_value < 255) && (ramp.modulation_value > 0)) {
-			ramp.modulation_value += tparameters[PARAM_QCW_RAMP].value;
+			ramp.modulation_value += param.qcw_ramp;
 			if (ramp.modulation_value > 255)
 				ramp.modulation_value = 255;
 			ramp_control();
@@ -192,7 +192,7 @@ CY_ISR(isr_interrupter) {
 	int16_t temp_pulse;
 	temp_pulse = fifo_get_nowait(&pulse_fifo);
 	if (temp_pulse != -1) {
-		interrupter_oneshot(tparameters[PARAM_PW].value, temp_pulse);
+		interrupter_oneshot(param.pw, temp_pulse);
 	}
 	Offtime_ReadStatusRegister();
 }

@@ -62,7 +62,7 @@ xSemaphoreHandle tsk_fault_Mutex;
 
 void handle_watchdog_reset(void) {
 	//for test use: set wd_kill = 1 to defeat the watchdog timeout
-	if (!confparam[CONF_WD].value) {
+	if (!configuration.watchdog) {
 		watchdog_reset_Control = 1;
 		watchdog_reset_Control = 0;
 	}

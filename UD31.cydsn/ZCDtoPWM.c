@@ -61,18 +61,18 @@ void configure_CT1(void) {
 	float min_tr_cl_dac_val_temp;
 
 	//figure out the CT setups
-	max_tr_cl_dac_val_temp = (((float)confparam[CONF_MAX_TR_CURRENT].value / (float)confparam[CONF_CT1_RATIO].value) * confparam[CONF_CT1_BURDEN].value) / (DAC_VOLTS_PER_STEP * 10);
+	max_tr_cl_dac_val_temp = (((float)configuration.max_tr_current / (float)configuration.ct1_ratio) * configuration.ct1_burden) / (DAC_VOLTS_PER_STEP * 10);
 	if (max_tr_cl_dac_val_temp > 255) {
 		max_tr_cl_dac_val_temp = 255;
 	}
 	params.max_tr_cl_dac_val = round(max_tr_cl_dac_val_temp);
-	max_qcw_cl_dac_val_temp = (((float)confparam[CONF_MAX_QCW_CURRENT].value / (float)confparam[CONF_CT1_RATIO].value) * confparam[CONF_CT1_BURDEN].value) / (DAC_VOLTS_PER_STEP * 10);
+	max_qcw_cl_dac_val_temp = (((float)configuration.max_qcw_current / (float)configuration.ct1_ratio) * configuration.ct1_burden) / (DAC_VOLTS_PER_STEP * 10);
 	if (max_qcw_cl_dac_val_temp > 255) {
 		max_qcw_cl_dac_val_temp = 255;
 	}
 
 	params.max_qcw_cl_dac_val = round(max_qcw_cl_dac_val_temp);
-	min_tr_cl_dac_val_temp = (((float)confparam[CONF_MIN_TR_CURRENT].value / (float)confparam[CONF_CT1_RATIO].value) * confparam[CONF_CT1_BURDEN].value) / (DAC_VOLTS_PER_STEP * 10);
+	min_tr_cl_dac_val_temp = (((float)configuration.min_tr_current / (float)configuration.ct1_ratio) * configuration.ct1_burden) / (DAC_VOLTS_PER_STEP * 10);
 	if (min_tr_cl_dac_val_temp > 255) {
 		min_tr_cl_dac_val_temp = 255;
 	}
@@ -87,10 +87,10 @@ void configure_CT1(void) {
 
 void configure_CT2(void) {
 	//DC CT full scale
-	params.Idc_fs = (50 * (float)confparam[CONF_CT2_RATIO].value) / (confparam[CONF_CT2_BURDEN].value * 4096);
+	params.Idc_fs = (50 * (float)configuration.ct2_ratio) / (configuration.ct2_burden * 4096);
 
 	//DC CT mA_Count
-	params.idc_ma_count = (uint32_t)((confparam[CONF_CT2_RATIO].value * 50 * 1000) / confparam[CONF_CT2_BURDEN].value) / 4096;
+	params.idc_ma_count = (uint32_t)((configuration.ct2_ratio * 50 * 1000) / configuration.ct2_burden) / 4096;
 }
 
 void configure_ZCD_to_PWM(void) {
@@ -104,20 +104,20 @@ void configure_ZCD_to_PWM(void) {
 	configure_CT2();
 
 	//initialize the ZCD counter
-	if (confparam[CONF_START_CYCLES].value == 0) {
+	if (configuration.start_cycles == 0) {
 		ZCD_counter_WritePeriod(1);
 		ZCD_counter_WriteCompare(1);
 	} else {
-		ZCD_counter_WritePeriod(confparam[CONF_START_CYCLES].value * 2);
+		ZCD_counter_WritePeriod(configuration.start_cycles * 2);
 		ZCD_counter_WriteCompare(4);
 	}
 
 	//calculate lead time
-	lead_time_temp = (float)confparam[CONF_LEAD_TIME].value / CPU_CLK_PERIOD;
+	lead_time_temp = (float)configuration.lead_time / CPU_CLK_PERIOD;
 	params.lead_time = round(lead_time_temp);
 
 	//calculate starting period
-	pwm_start_prd_temp = BCLK__BUS_CLK__HZ / (confparam[CONF_START_FREQ].value * 200); //why 200? well 2 because its half-periods, and 100 because frequency is in hz*100
+	pwm_start_prd_temp = BCLK__BUS_CLK__HZ / (configuration.start_freq * 200); //why 200? well 2 because its half-periods, and 100 because frequency is in hz*100
 	params.pwm_top = round(pwm_start_prd_temp * 2);								  //top value for FB capture and pwm generators to avoid ULF crap
 	params.pwma_start_prd = params.pwm_top - params.lead_time;
 	params.pwma_start_cmp = params.pwm_top - pwm_start_prd_temp + 4; //untested, was just 4;

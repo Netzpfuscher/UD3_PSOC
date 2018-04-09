@@ -1371,6 +1371,11 @@
     </Group>
   </Group>
   <Data key="DataVersionKey" value="2" />
+  <Group key="DMA">
+    <Data key="2dfce217-1794-49fc-9f78-716a76e8e77c" value="0" />
+    <Data key="5a5b75d8-8669-41f4-a985-1e9dde7cf2d8" value="7" />
+    <Data key="4980b51b-23c7-4c52-bb97-d0c7862efe52" value="7" />
+  </Group>
   <Group key="DWRInstGuidMapping">
     <Group key="Clock">
       <Data key="0e7954a6-2e5f-476a-9c56-6bc09bc35a57" value="Clock_5" />
@@ -1418,6 +1423,45 @@
       <Data key="de616538-7905-4862-82c6-a78f5f922004" value="Clock_5" />
       <Data key="f3d7bf91-0126-4cc2-9abc-06bf35ae8645" value="adc_clk" />
       <Data key="ff9b0827-bdb4-4e8a-91b3-a198eec29ddc" value="Clock_15" />
+    </Group>
+    <Group key="DMA">
+      <Data key="2dfce217-1794-49fc-9f78-716a76e8e77c" value="PWMA_init_DMA" />
+      <Data key="3c6661a5-9630-4e43-87ef-7d1ab83f15f4" value="TR1_CL_DMA" />
+      <Data key="4c33e2da-12d7-4024-90e0-c7c5349fc02d" value="MUX_DMA" />
+      <Data key="5a5b75d8-8669-41f4-a985-1e9dde7cf2d8" value="therm_dma" />
+      <Data key="16bbcbf1-3688-460c-8a50-cd3468d19953" value="PWMB_PSB_DMA" />
+      <Data key="76d651a8-74ab-44c9-ae67-e42605189f68" value="QCW_CL_DMA" />
+      <Data key="659c56f8-ea77-48c8-9e0a-c51edfd013d5" value="filter_to_fram_DMA" />
+      <Data key="0992f4b5-ba67-4ad0-a246-49757a31913d" value="ram_to_filter_DMA" />
+      <Data key="1802e906-d19e-4cae-ba09-b980b6f0cb00" value="FBC_to_ram_DMA" />
+      <Data key="4980b51b-23c7-4c52-bb97-d0c7862efe52" value="ADC_DMA" />
+      <Data key="b26ca7a3-5648-4cf3-9f10-7d833e5488e7" value="PSBINIT_DMA" />
+      <Data key="b9085c23-556a-4c14-b995-04b3b6831e19" value="fram_to_PWMA_DMA" />
+      <Data key="c3fa8456-01a6-4e64-8ec6-fc2a4eb0782b" value="int1_dma" />
+    </Group>
+    <Group key="Interrupt">
+      <Data key="2b269b96-47a4-4e9a-937e-76d4080bb211/8c70c28a-acdf-4af1-b803-ce0c58edb918" value="USBMIDI_1_ep_3" />
+      <Data key="2b269b96-47a4-4e9a-937e-76d4080bb211/13a8975c-7fb7-4bb9-91f3-189a6b7c1d86" value="USBMIDI_1_ep_1" />
+      <Data key="2b269b96-47a4-4e9a-937e-76d4080bb211/14a64edd-1110-4249-9ed3-caf733794e1c" value="USBMIDI_1_ep_5" />
+      <Data key="2b269b96-47a4-4e9a-937e-76d4080bb211/32c79bfe-13d8-4583-b2de-bc111c0e27d4" value="USBMIDI_1_ep_4" />
+      <Data key="2b269b96-47a4-4e9a-937e-76d4080bb211/52c66e35-efb9-4cb3-a434-6304eda17cd2" value="USBMIDI_1_ep_2" />
+      <Data key="2b269b96-47a4-4e9a-937e-76d4080bb211/70277391-b927-4e50-8d12-6874a5c53f72" value="USBMIDI_1_bus_reset" />
+      <Data key="2b269b96-47a4-4e9a-937e-76d4080bb211/d91ea660-bc91-4817-b29b-2fe86c305500" value="USBMIDI_1_arb_int" />
+      <Data key="2b269b96-47a4-4e9a-937e-76d4080bb211/dc6da32b-30f7-48b3-b8a1-dbf0214d8c83" value="USBMIDI_1_dp_int" />
+      <Data key="2b269b96-47a4-4e9a-937e-76d4080bb211/ef9224ec-f8a6-4df0-8a49-e09ce75cefa7" value="USBMIDI_1_ep_0" />
+      <Data key="2e6a47c6-d5f4-4ebd-966c-a132f3287d0c" value="isr_midi" />
+      <Data key="2fb7452b-f15f-4615-b66c-bdee4f657095" value="isr_interrupter" />
+      <Data key="7ea88270-49e6-43be-82b7-63948e7960a3/b73dcd38-4bce-4cd7-acec-33f53e91ccd6" value="ADC_IRQ" />
+      <Data key="9d178943-a2e6-45cb-a262-b16444a207ec" value="uart_rx" />
+      <Data key="9da6251c-7193-4905-b500-c8ed56bec282" value="uart_tx" />
+      <Data key="29aa49e1-b695-418d-b21c-cd85130a5a1c" value="qcw_end" />
+      <Data key="6533b513-81b1-46af-8e19-d98fd9cc0e1c/b73dcd38-4bce-4cd7-acec-33f53e91ccd6" value="ADC_therm_IRQ" />
+      <Data key="8759c8f7-2d39-40ac-839a-fcdda7f406e7" value="therm_sample" />
+      <Data key="1190957d-2d75-429b-86e8-ff9a02fc3853" value="OCD" />
+      <Data key="affc1367-3aa2-45e1-81fc-fe0b51fd27b1" value="isr_primary_current" />
+      <Data key="ccf7552c-98fc-46a0-91ef-eac693332ad4" value="qcw_dl_ovf" />
+      <Data key="d5994c35-66e1-4204-a1a6-5d40de4380cc" value="ADC_data_ready" />
+      <Data key="dec47964-b682-4738-b517-03b0233c3cbf" value="int_wd" />
     </Group>
     <Group key="Pin">
       <Data key="0ee38e66-4293-4d64-b304-31655fd93ab0" value="GD1B" />
@@ -4543,6 +4587,29 @@
       </Group>
       <Group key="1024">
         <Data key="LevelKey" value="00" />
+      </Group>
+    </Group>
+  </Group>
+  <Group key="Interrupt">
+    <Group key="29aa49e1-b695-418d-b21c-cd85130a5a1c">
+      <Group key="CortexM3">
+        <Data key="Assigned" value="True" />
+        <Data key="Priority" value="4" />
+        <Data key="Vector" value="-1" />
+      </Group>
+    </Group>
+    <Group key="8759c8f7-2d39-40ac-839a-fcdda7f406e7">
+      <Group key="CortexM3">
+        <Data key="Assigned" value="True" />
+        <Data key="Priority" value="5" />
+        <Data key="Vector" value="-1" />
+      </Group>
+    </Group>
+    <Group key="dec47964-b682-4738-b517-03b0233c3cbf">
+      <Group key="CortexM3">
+        <Data key="Assigned" value="True" />
+        <Data key="Priority" value="3" />
+        <Data key="Vector" value="-1" />
       </Group>
     </Group>
   </Group>

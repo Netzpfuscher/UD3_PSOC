@@ -112,6 +112,13 @@ CY_ISR(ADC_data_ready_ISR) {
 	}
 }
 
+CY_ISR(isr_primary) {
+    telemetry.primary_i = CT1_Get_Current(CT_PRIMARY);
+    if(telemetry.primary_i > configuration.max_tr_current){
+        ct1_dac_val[0]--;
+    }
+}
+
 uint32_t read_bus_mv(uint16_t raw_adc) {
 	uint32_t bus_voltage;
 	bus_voltage = ((BUSV_R_TOP + BUSV_R_BOT) * raw_adc) / (BUSV_R_BOT * 819 / 1000);
@@ -122,9 +129,9 @@ uint16_t CT1_Get_Current(uint8_t channel) {
 	uint32_t result = ADC_DelSig_1_GetResult32();
 
 	if (channel == CT_PRIMARY) {
-		return ((ADC_DelSig_1_CountsTo_mVolts(result) * confparam[CONF_CT1_RATIO].value) / confparam[CONF_CT1_BURDEN].value) / 100;
+		return ((ADC_DelSig_1_CountsTo_mVolts(result) * configuration.ct1_ratio) / configuration.ct1_burden) / 100;
 	} else {
-		return ((ADC_DelSig_1_CountsTo_mVolts(result) * confparam[CONF_CT3_RATIO].value) / confparam[CONF_CT3_BURDEN].value) / 100;
+		return ((ADC_DelSig_1_CountsTo_mVolts(result) * configuration.ct3_ratio) / configuration.ct3_burden) / 100;
 	}
 }
 
@@ -132,9 +139,9 @@ float CT1_Get_Current_f(uint8_t channel) {
 	uint32_t result = ADC_DelSig_1_GetResult32();
 
 	if (channel == CT_PRIMARY) {
-		return ((float)(ADC_DelSig_1_CountsTo_Volts(result) * 10) / (float)(confparam[CONF_CT1_BURDEN].value) * confparam[CONF_CT1_RATIO].value);
+		return ((float)(ADC_DelSig_1_CountsTo_Volts(result) * 10) / (float)(configuration.ct1_burden) * configuration.ct1_ratio);
 	} else {
-		return ((float)(ADC_DelSig_1_CountsTo_Volts(result) * 10) / (float)(confparam[CONF_CT3_BURDEN].value) * confparam[CONF_CT3_RATIO].value);
+		return ((float)(ADC_DelSig_1_CountsTo_Volts(result) * 10) / (float)(configuration.ct3_burden) * configuration.ct3_ratio);
 	}
 }
 
@@ -253,6 +260,8 @@ void tsk_analog_TaskProc(void *pvParameters) {
 	adc_ready_Semaphore = xSemaphoreCreateBinary();
 
 	initialize_analogs();
+    
+    isr_primary_current_StartEx(isr_primary);
 
 	/* `#END` */
 

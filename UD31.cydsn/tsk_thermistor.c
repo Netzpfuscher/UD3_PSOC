@@ -130,16 +130,16 @@ uint8 run_temp_check(void) {
 	telemetry.temp1 = get_temp_128(therm_sample[0]) / 128;
 	telemetry.temp2 = get_temp_128(therm_sample[1]) / 128;
 
-	if (telemetry.temp1 > confparam[CONF_TEMP1_MAX].value) {
+	if (telemetry.temp1 > configuration.temp1_max) {
 		fault |= TEMP1_FAULT;
 	}
-	if (telemetry.temp2 > confparam[CONF_TEMP2_MAX].value) {
+	if (telemetry.temp2 > configuration.temp2_max) {
 		fault |= TEMP2_FAULT;
 	}
 
-	if (telemetry.temp1 > confparam[CONF_TEMP1_SETPOINT].value) {
+	if (telemetry.temp1 > configuration.temp1_setpoint) {
 		fan_ctrl_Control = 1;
-	} else if (telemetry.temp1 < confparam[CONF_TEMP1_SETPOINT].value) {
+	} else if (telemetry.temp1 < configuration.temp1_setpoint) {
 		fan_ctrl_Control = 0;
 	}
 	return fault;

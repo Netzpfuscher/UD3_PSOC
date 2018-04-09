@@ -35,15 +35,15 @@ uint32 charging_counter;
 
 void initialize_charging(void) {
 	telemetry.bus_status = BUS_OFF;
-	if ((confparam[CONF_PS_SCHEME].value == BAT_BOOST_BUS_SCHEME) || (confparam[CONF_PS_SCHEME].value == AC_OR_BATBOOST_SCHEME)) {
+	if ((configuration.ps_scheme == BAT_BOOST_BUS_SCHEME) || (configuration.ps_scheme == AC_OR_BATBOOST_SCHEME)) {
 		SLR_Control = 0;
 		SLRPWM_Start();
-		if (confparam[CONF_SLR_FSWITCH].value == 0) {
-			confparam[CONF_SLR_FSWITCH].value = 500; //just in case it wasnt ever programmed
+		if (configuration.slr_fswitch == 0) {
+			configuration.slr_fswitch = 500; //just in case it wasnt ever programmed
 													 //store_setting(SET_SLR_FSWITCH, config.SLR_Fswitch);
 		}
 		uint16 x;
-		x = (320000 / (confparam[CONF_SLR_FSWITCH].value));
+		x = (320000 / (configuration.slr_fswitch));
 		if ((x % 2) != 0)
 			x++; //we want x to be even
 		SLRPWM_WritePeriod(x + 1);
@@ -60,9 +60,9 @@ void control_precharge(void) { //this gets called from analogs.c when the ADC da
 	static uint8_t cnt = 0;
 
 	if (bus_command == BUS_COMMAND_ON) {
-		if (confparam[CONF_PS_SCHEME].value == BAT_PRECHARGE_BUS_SCHEME) {
+		if (configuration.ps_scheme == BAT_PRECHARGE_BUS_SCHEME) {
 			v_threshold = (float)telemetry.batt_v * 0.95;
-			if (telemetry.batt_v >= (confparam[CONF_BATT_LOCKOUT_V].value - 1)) {
+			if (telemetry.batt_v >= (configuration.batt_lockout_v - 1)) {
 				if (telemetry.bus_v >= v_threshold) {
 					relay_Write(RELAY_ON);
 					telemetry.bus_status = BUS_READY;
@@ -81,16 +81,16 @@ void control_precharge(void) { //this gets called from analogs.c when the ADC da
 			}
 		}
 
-		else if (confparam[CONF_PS_SCHEME].value == BAT_BOOST_BUS_SCHEME) {
-			if (telemetry.bus_v < (confparam[CONF_SLR_VBUS].value - 15)) {
+		else if (configuration.ps_scheme == BAT_BOOST_BUS_SCHEME) {
+			if (telemetry.bus_v < (configuration.slr_vbus - 15)) {
 				SLR_Control = 1;
 				telemetry.bus_status = BUS_READY; //its OK to operate the TC when charging from SLR
-			} else if (telemetry.bus_v > confparam[CONF_SLR_VBUS].value) {
+			} else if (telemetry.bus_v > configuration.slr_vbus) {
 				SLR_Control = 0;
 				telemetry.bus_status = BUS_READY;
 			}
 
-			if (telemetry.batt_v >= (confparam[CONF_BATT_LOCKOUT_V].value - 1)) {
+			if (telemetry.batt_v >= (configuration.batt_lockout_v - 1)) {
 				low_battery_counter = 0;
 			} else {
 				low_battery_counter++;
@@ -102,7 +102,7 @@ void control_precharge(void) { //this gets called from analogs.c when the ADC da
 			}
 		}
 
-		else if (confparam[CONF_PS_SCHEME].value == AC_PRECHARGE_BUS_SCHEME) {
+		else if (configuration.ps_scheme == AC_PRECHARGE_BUS_SCHEME) {
 			//we cant know the AC line voltage so we will watch the bus voltage climb and infer when its charged by it not increasing fast enough
 			//this logic is part of a charging counter
 			if (charging_counter == 0)
@@ -123,7 +123,7 @@ void control_precharge(void) { //this gets called from analogs.c when the ADC da
 			}
 		}
 
-		else if (confparam[CONF_PS_SCHEME].value == AC_OR_BATBOOST_SCHEME) {
+		else if (configuration.ps_scheme == AC_OR_BATBOOST_SCHEME) {
 			//this routine determines if the battery or the AC line should be used
 			//first, assume there is mains voltage
 			relay_Write(RELAY_CHARGE);
@@ -136,10 +136,10 @@ void control_precharge(void) { //this gets called from analogs.c when the ADC da
 				final_vbus = telemetry.bus_v;
 				delta_vbus = final_vbus - initial_vbus;
 				if (delta_vbus > 4)
-					confparam[CONF_PS_SCHEME].value = AC_PRECHARGE_BUS_SCHEME;
+					configuration.ps_scheme = AC_PRECHARGE_BUS_SCHEME;
 				//if this fails, check, is there battery voltage?
-				else if (telemetry.batt_v >= (confparam[CONF_BATT_LOCKOUT_V].value - 1)) {
-					confparam[CONF_PS_SCHEME].value = BAT_BOOST_BUS_SCHEME;
+				else if (telemetry.batt_v >= (configuration.batt_lockout_v - 1)) {
+					configuration.ps_scheme = BAT_BOOST_BUS_SCHEME;
 					relay_Write(RELAY_OFF);
 				} else
 					bus_command = BUS_COMMAND_FAULT;

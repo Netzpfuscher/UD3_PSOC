@@ -69,7 +69,7 @@ void initialize_interrupter(void) {
 	interrupter1_WriteCompare1(64999);
 
 	QCW_duty_limiter_WritePeriod(65535);
-	QCW_duty_limiter_WriteCompare(65535 - confparam[CONF_MAX_QCW_PW].value); //this register sets the max PW output
+	QCW_duty_limiter_WriteCompare(65535 - configuration.max_qcw_pw); //this register sets the max PW output
 
 	int1_prd = 65000;
 	int1_cmp = 64999;
@@ -89,13 +89,13 @@ void initialize_interrupter(void) {
 	qcw_dl_ovf_StartEx(qcw_dl_ovf_ISR);
 	qcw_end_StartEx(qcw_end_ISR);
 
-	if (confparam[CONF_EXT_TRIG_ENABLE].value) {
+	if (configuration.ext_trig_enable) {
 		trigger_bypass_Write(0); //0 enables the trigger input, 1 bypasses it so the interrupter can always run
 	} else {
 		trigger_bypass_Write(1);
 	}
 
-	params.min_tr_prd = INTERRUPTER_CLK_FREQ / confparam[CONF_MAX_TR_PRF].value;
+	params.min_tr_prd = INTERRUPTER_CLK_FREQ / configuration.max_tr_prf;
 
 	/* Variable declarations for int1_dma */
 	uint8 int1_dma_Chan;
@@ -128,9 +128,9 @@ void ramp_control(void) {
 			else
 				ramp.qcw_recorded_prd = 65535 - QCW_duty_limiter_ReadCounter(); //else, look at the counter to see where we are at since last pulse
 			qcw_dl_ovf_counter = 0;
-			ramp.qcw_limiter_pw = (ramp.qcw_recorded_prd * confparam[CONF_MAX_QCW_DUTY].value) / 1000;
-			if ((ramp.qcw_limiter_pw > confparam[CONF_MAX_QCW_PW].value) || (ramp.qcw_limiter_pw == 0)) {
-				ramp.qcw_limiter_pw = confparam[CONF_MAX_QCW_PW].value;
+			ramp.qcw_limiter_pw = (ramp.qcw_recorded_prd * configuration.max_qcw_duty) / 1000;
+			if ((ramp.qcw_limiter_pw > configuration.max_qcw_pw) || (ramp.qcw_limiter_pw == 0)) {
+				ramp.qcw_limiter_pw = configuration.max_qcw_pw;
 			}
 			//the next stuff is time sensitive, so disable interrupts to avoid glitches
 			CyGlobalIntDisable;
@@ -167,8 +167,8 @@ void interrupter_oneshot(uint16_t pw, uint8_t vol) {
 		ct1_dac_val[0] = params.max_tr_cl_dac_val;
 	}
 	uint16_t prd;
-	if (pw > confparam[CONF_MAX_TR_PW].value) {
-		pw = confparam[CONF_MAX_TR_PW].value;
+	if (pw > configuration.max_tr_pw) {
+		pw = configuration.max_tr_pw;
 	}
 	prd = 60000;
 	/* Update Interrupter PWMs with new period/pw */
@@ -178,9 +178,6 @@ void interrupter_oneshot(uint16_t pw, uint8_t vol) {
 	interrupter1_control_Control = 0b01;
 	interrupter1_control_Control = 0b00;
 	CyGlobalIntEnable;
-	/* Reset Watchdog */
-	//watchdog_reset_Control = 1;
-	//watchdog_reset_Control = 0;
 	return;
 }
 
@@ -192,8 +189,8 @@ void update_interrupter() {
 	}
 
 	/* Check the pulsewidth command */
-	if (interrupter.pw > confparam[CONF_MAX_TR_PW].value) {
-		interrupter.pw = confparam[CONF_MAX_TR_PW].value;
+	if (interrupter.pw > configuration.max_tr_pw) {
+		interrupter.pw = configuration.max_tr_pw;
 	}
 
 	/* Check that the period is long enough to meet restrictions, if not, scale it */
@@ -206,8 +203,8 @@ void update_interrupter() {
 	uint16 new_duty;
 	interrupter.duty = (interrupter.pw * 1000) / interrupter.prd; //gives duty cycle as 0.1% increment
 	total_duty = interrupter.duty;
-	if (total_duty > confparam[CONF_MAX_TR_DUTY].value) {
-		new_duty = (confparam[CONF_MAX_TR_DUTY].value * interrupter.duty) / total_duty;
+	if (total_duty > configuration.max_tr_duty) {
+		new_duty = (configuration.max_tr_duty * interrupter.duty) / total_duty;
 		interrupter.duty_limited_pw = new_duty * interrupter.prd / 1000;
 	} else {
 		interrupter.duty_limited_pw = interrupter.pw;

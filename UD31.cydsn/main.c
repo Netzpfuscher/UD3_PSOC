@@ -55,14 +55,16 @@ void vMainTask(void *pvParameters);
 static void prvFreeRTOSSetup( void );
 
 
-
 int main() {
     
     prvFreeRTOSSetup();
     
 	system_fault_Control = 0; //this should suppress any start-up sparking until the system is ready
-	EEPROM_1_Start();
-	eprom_load();
+	init_config();
+    EEPROM_1_Start();
+    eeprom_load();
+   
+    
 	initialize_DMA();		  //sets up all DMA channels
 	initialize_interrupter(); //initializes hardware related to the interrupter
 	initialize_ZCD_to_PWM();  //initializes hardware related to ZCD to PWM

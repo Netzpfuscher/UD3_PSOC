@@ -23,6 +23,7 @@
 */
 
 #include <device.h>
+#include "cli_basic.h"
 
 /* RTOS includes. */
 #include "FreeRTOS.h"
@@ -30,55 +31,6 @@
 #include "queue.h"
 #include "semphr.h"
 #include "timers.h"
-
-struct parameter_entry_struct {
-	const char *name;
-	uint16_t value;
-	uint16_t min;
-	uint16_t max;
-	uint8_t (*updateFunction)(int newValue, uint8_t index);
-	const char *help;
-};
-
-typedef struct parameter_entry_struct parameter_entry;
-
-#define PARAM_PW 0
-#define PARAM_PWD 1
-#define PARAM_TUNE_SFREQ 2
-#define PARAM_TUNE_EFREQ 3
-#define PARAM_TUNE_PW 4
-#define PARAM_TUNE_DELAY 5
-#define PARAM_OFFTIME 6
-#define PARAM_QCW_RAMP 7
-#define PARAM_QCW_REPEAT 8
-
-#define CONF_WD 0
-#define CONF_MAX_TR_PW 1
-#define CONF_MAX_TR_PRF 2
-#define CONF_MAX_QCW_PW 3
-#define CONF_MAX_TR_CURRENT 4
-#define CONF_MIN_TR_CURRENT 5
-#define CONF_MAX_QCW_CURRENT 6
-#define CONF_TEMP1_MAX 7
-#define CONF_TEMP2_MAX 8
-#define CONF_CT1_RATIO 9
-#define CONF_CT2_RATIO 10
-#define CONF_CT3_RATIO 11
-#define CONF_CT1_BURDEN 12
-#define CONF_CT2_BURDEN 13
-#define CONF_CT3_BURDEN 14
-#define CONF_LEAD_TIME 15
-#define CONF_START_FREQ 16
-#define CONF_START_CYCLES 17
-#define CONF_MAX_TR_DUTY 18
-#define CONF_MAX_QCW_DUTY 19
-#define CONF_TEMP1_SETPOINT 20
-#define CONF_EXT_TRIG_ENABLE 21
-#define CONF_BATT_LOCKOUT_V 22
-#define CONF_SLR_FSWITCH 23
-#define CONF_SLR_VBUS 24
-#define CONF_PS_SCHEME 25
-#define CONF_AUTOTUNE_SAMPLES 26
 
 #define MODE_MIDI 0
 #define MODE_CLASSIC 1
@@ -89,37 +41,71 @@ typedef struct parameter_entry_struct parameter_entry;
 #define auto_charge_battery 0
 #define ext_trig_runs_CW 0 //special test mode where holding the trigger runs the coil in CW mode
 
-#define SERIAL 0
-#define USB 1
+
 
 uint8_t input_handle();
-void input_interpret(uint8_t port);
-void input_restart(void);
-void Term_Move_Cursor(uint8_t row, uint8_t column, uint8_t port);
-void Term_Erase_Screen(uint8_t port);
-void Term_Color_Green(uint8_t port);
-void Term_Color_Red(uint8_t port);
-void Term_Color_White(uint8_t port);
-void Term_Color_Cyan(uint8_t port);
-void Term_BGColor_Blue(uint8_t port);
-void Term_Save_Cursor(uint8_t port);
-void Term_Restore_Cursor(uint8_t port);
-void Term_Box(uint8_t row1, uint8_t col1, uint8_t row2, uint8_t col2, uint8_t port);
-void send_char(uint8_t c, uint8_t port);
-void send_string(char *data, uint8_t port);
-void send_buffer(uint8_t *data, uint16_t len, uint8_t port);
-uint8_t term_config_changed(void);
+
 void nt_interpret(const char *text, uint8_t port);
-uint8_t eprom_load(void);
+void init_config();
+void eeprom_load();
 
 void initialize_term(void);
 void task_terminal_overlay(void);
-
+uint8_t command_cls(char *commandline, uint8_t port);
 ///Help
 void task_terminal();
 
-extern volatile parameter_entry tparameters[];
+extern parameter_entry tparameters[];
 volatile uint8_t qcw_reg;
 extern parameter_entry confparam[];
 
 xSemaphoreHandle block_term[2];
+
+struct config_struct{
+    uint8_t watchdog;
+    uint16_t max_tr_pw;
+    uint16_t max_tr_prf;
+    uint16_t max_qcw_pw;
+    uint16_t max_tr_current;
+    uint16_t min_tr_current;
+    uint16_t max_qcw_current;
+    uint8_t temp1_max;
+    uint8_t temp2_max;
+    uint16_t ct1_ratio;
+    uint16_t ct2_ratio;
+    uint16_t ct3_ratio;
+    uint16_t ct1_burden;
+    uint16_t ct2_burden;
+    uint16_t ct3_burden;
+    uint16_t lead_time;
+    uint16_t start_freq;
+    uint8_t  start_cycles;
+    uint16_t max_tr_duty;
+    uint16_t max_qcw_duty;
+    uint16_t temp1_setpoint;
+    uint16_t ext_trig_enable;
+    uint16_t batt_lockout_v;
+    uint16_t slr_fswitch;
+    uint16_t slr_vbus;
+    uint8_t ps_scheme;
+    uint8_t autotune_s;
+    char ud_name[16];
+};
+typedef struct config_struct cli_config;
+
+struct parameter_struct{
+    uint16_t pw;
+	uint16_t pwd;
+    uint16_t tune_start;
+    uint16_t tune_end;
+    uint16_t tune_pw;
+    uint16_t tune_delay;
+    uint16_t offtime;
+    uint8_t  qcw_ramp;
+    uint16_t  qcw_repeat;
+};
+typedef struct parameter_struct cli_parameter;
+
+extern cli_config configuration;
+extern cli_parameter param;
+
