@@ -210,7 +210,7 @@ void tsk_thermistor_Start(void) {
 	 	* Create the task and then leave. When FreeRTOS starts up the scheduler
 	 	* will call the task procedure and start execution of the task.
 	 	*/
-		xTaskCreate(tsk_thermistor_TaskProc, "Therm", 512, NULL, PRIO_THERMISTOR, &tsk_thermistor_TaskHandle);
+		xTaskCreate(tsk_thermistor_TaskProc, "Therm", 128, NULL, PRIO_THERMISTOR, &tsk_thermistor_TaskHandle);
 		tsk_thermistor_initVar = 1;
 	}
 }

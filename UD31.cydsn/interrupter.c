@@ -89,12 +89,6 @@ void initialize_interrupter(void) {
 	qcw_dl_ovf_StartEx(qcw_dl_ovf_ISR);
 	qcw_end_StartEx(qcw_end_ISR);
 
-	if (configuration.ext_trig_enable) {
-		trigger_bypass_Write(0); //0 enables the trigger input, 1 bypasses it so the interrupter can always run
-	} else {
-		trigger_bypass_Write(1);
-	}
-
 	params.min_tr_prd = INTERRUPTER_CLK_FREQ / configuration.max_tr_prf;
 
 	/* Variable declarations for int1_dma */

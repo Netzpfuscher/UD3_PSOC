@@ -256,8 +256,8 @@ void tsk_cli_Start(void) {
 	 	* Create the task and then leave. When FreeRTOS starts up the scheduler
 	 	* will call the task procedure and start execution of the task.
 	 	*/
-		xTaskCreate(tsk_cli_TaskProc, "UART-CLI", 1024, (void *)SERIAL, PRIO_TERMINAL, &UART_Terminal_TaskHandle);
-		xTaskCreate(tsk_cli_TaskProc, "USB-CLI", 1024, (void *)USB, PRIO_TERMINAL, &USB_Terminal_TaskHandle);
+		xTaskCreate(tsk_cli_TaskProc, "UART-CLI", 512, (void *)SERIAL, PRIO_TERMINAL, &UART_Terminal_TaskHandle);
+		xTaskCreate(tsk_cli_TaskProc, "USB-CLI", 512, (void *)USB, PRIO_TERMINAL, &USB_Terminal_TaskHandle);
 		tsk_cli_initVar = 1;
 	}
 }

@@ -107,7 +107,7 @@ CY_ISR(ADC_data_ready_ISR) {
 		xQueueSendFromISR(adc_data, ADC_sample_buf, NULL);
 	}
 
-	if (uxQueueMessagesWaitingFromISR(adc_data) > 100) {
+	if (uxQueueMessagesWaitingFromISR(adc_data) > 25) {
 		xSemaphoreGiveFromISR(adc_ready_Semaphore, NULL);
 	}
 }
@@ -203,10 +203,9 @@ void initialize_analogs(void) {
 	uint8 ADC_DMA_Chan;
 	uint8 ADC_DMA_TD[1];
 
-	ADC_DMA_Chan = ADC_DMA_DmaInitialize(ADC_DMA_BYTES_PER_BURST, ADC_DMA_REQUEST_PER_BURST,
-										 HI16(ADC_DMA_SRC_BASE), HI16(ADC_DMA_DST_BASE));
+	ADC_DMA_Chan = ADC_DMA_DmaInitialize(ADC_DMA_BYTES_PER_BURST, ADC_DMA_REQUEST_PER_BURST, HI16(ADC_DMA_SRC_BASE), HI16(ADC_DMA_DST_BASE));
 	ADC_DMA_TD[0] = CyDmaTdAllocate();
-	CyDmaTdSetConfiguration(ADC_DMA_TD[0], 8, ADC_DMA_TD[0], TD_INC_DST_ADR);
+	CyDmaTdSetConfiguration(ADC_DMA_TD[0], 8, ADC_DMA_TD[0], ADC_DMA__TD_TERMOUT_EN | TD_INC_DST_ADR);
 	CyDmaTdSetAddress(ADC_DMA_TD[0], LO16((uint32)ADC_SAR_WRK0_PTR), LO16((uint32)ADC_sample_buf));
 	CyDmaChSetInitialTd(ADC_DMA_Chan, ADC_DMA_TD[0]);
 	CyDmaChEnable(ADC_DMA_Chan, 1);
@@ -217,8 +216,7 @@ void initialize_analogs(void) {
 	uint8 MUX_DMA_TD[1];
 
 	/* DMA Configuration for MUX_DMA */
-	MUX_DMA_Chan = MUX_DMA_DmaInitialize(MUX_DMA_BYTES_PER_BURST, MUX_DMA_REQUEST_PER_BURST,
-										 HI16(MUX_DMA_SRC_BASE), HI16(MUX_DMA_DST_BASE));
+	MUX_DMA_Chan = MUX_DMA_DmaInitialize(MUX_DMA_BYTES_PER_BURST, MUX_DMA_REQUEST_PER_BURST, HI16(MUX_DMA_SRC_BASE), HI16(MUX_DMA_DST_BASE));
 	MUX_DMA_TD[0] = CyDmaTdAllocate();
 	CyDmaTdSetConfiguration(MUX_DMA_TD[0], 4, MUX_DMA_TD[0], CY_DMA_TD_INC_SRC_ADR);
 	CyDmaTdSetAddress(MUX_DMA_TD[0], LO16((uint32)ADC_mux_ctl), LO16((uint32)Amux_Ctrl_Control_PTR));
@@ -296,7 +294,7 @@ void tsk_analog_Start(void) {
 	 	* Create the task and then leave. When FreeRTOS starts up the scheduler
 	 	* will call the task procedure and start execution of the task.
 	 	*/
-		xTaskCreate(tsk_analog_TaskProc, "Analog", 512, NULL, PRIO_ANALOG, &tsk_analog_TaskHandle);
+		xTaskCreate(tsk_analog_TaskProc, "Analog", 128, NULL, PRIO_ANALOG, &tsk_analog_TaskHandle);
 		tsk_analog_initVar = 1;
 	}
 }

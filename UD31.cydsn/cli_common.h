@@ -90,6 +90,7 @@ struct config_struct{
     uint8_t ps_scheme;
     uint8_t autotune_s;
     char ud_name[16];
+    char ip_addr[16];
 };
 typedef struct config_struct cli_config;
 

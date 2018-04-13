@@ -5,6 +5,7 @@
 
 #define SIZEP(x) ((char*)(&(x) + 1) - (char*)&(x))
 #define ADD_PARAM(para_type,text, value_var, type, min, max, update_func, help_text) {para_type,text, &value_var, SIZEP(value_var), type, min, max, update_func, help_text},
+#define ADD_COMMAND(command, command_func, help_text) {command, command_func, help_text},
 #define TYPE_UNSIGNED   0
 #define TYPE_SIGNED     1
 #define TYPE_FLOAT      2

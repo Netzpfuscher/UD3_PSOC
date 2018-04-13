@@ -68,11 +68,6 @@ uint8_t callback_TuneFunction(parameter_entry * params, uint8_t index, uint8_t p
 uint8_t callback_TRFunction(parameter_entry * params, uint8_t index, uint8_t port);
 uint8_t callback_OfftimeFunction(parameter_entry * params, uint8_t index, uint8_t port);
 
-uint8_t updateConfigFunction(parameter_entry * params, char * newValue, uint8_t index, uint8_t port);
-uint8_t updateTRFunction(parameter_entry * params, char * newValue, uint8_t index, uint8_t port);
-uint8_t updateTuneFunction(parameter_entry * params, char * newValue, uint8_t index, uint8_t port);
-uint8_t updateOfftimeFunction(int newValue, uint8_t index);
-
 uint8_t commandHelp(char *commandline, uint8_t port);
 uint8_t commandGet(char *commandline, uint8_t port);
 uint8_t commandSet(char *commandline, uint8_t port);
@@ -87,6 +82,8 @@ uint8_t command_tasks(char *commandline, uint8_t port);
 uint8_t command_bootloader(char *commandline, uint8_t port);
 uint8_t command_qcw(char *commandline, uint8_t port);
 uint8_t command_bus(char *commandline, uint8_t port);
+uint8_t command_load_default(char *commandline, uint8_t port);
+uint8_t command_reset(char *commandline, uint8_t port);
 
 void nt_interpret(const char *text, uint8_t port);
 
@@ -127,6 +124,7 @@ void init_config(){
     configuration.ps_scheme = 2;
     configuration.autotune_s = 1;
     strcpy(configuration.ud_name,"UD3-Tesla");
+    strcpy(configuration.ip_addr,"0.0.0.0");
     
     param.pw = 50;
     param.pwd = 50000;
@@ -141,25 +139,25 @@ void init_config(){
 
 // clang-format off
 parameter_entry confparam[] = {
-    //        Parameter Type,"Text   "         , Value ptr                     , Type          ,Min    ,Max    , UpdateFunction             ,Help text
+    //        Parameter Type,"Text   "         , Value ptr                     , Type          ,Min    ,Max    ,Callback Function           ,Help text
     ADD_PARAM(PARAM_DEFAULT ,"pw"              , param.pw                      , TYPE_UNSIGNED ,0      ,800    ,callback_TRFunction         ,"Pulsewidth")
     ADD_PARAM(PARAM_DEFAULT ,"pwd"             , param.pwd                     , TYPE_UNSIGNED ,0      ,60000  ,callback_TRFunction         ,"Pulsewidthdelay")
     ADD_PARAM(PARAM_DEFAULT ,"tune_start"      , param.tune_start              , TYPE_UNSIGNED ,5      ,400    ,callback_TuneFunction       ,"Start frequency")
     ADD_PARAM(PARAM_DEFAULT ,"tune_end"        , param.tune_end                , TYPE_UNSIGNED ,5      ,400    ,callback_TuneFunction       ,"End frequency")
-    ADD_PARAM(PARAM_DEFAULT ,"tune_pw"         , param.tune_pw                 , TYPE_UNSIGNED ,0      ,800    ,callback_DefaultFunction    ,"Tune pulsewidth")
-    ADD_PARAM(PARAM_DEFAULT ,"tune_delay"      , param.tune_delay              , TYPE_UNSIGNED ,1      ,200    ,callback_ConfigFunction     ,"Tune delay")
-    ADD_PARAM(PARAM_CONFIG  ,"offtime"         , param.offtime                 , TYPE_UNSIGNED ,2      ,250    ,callback_ConfigFunction     ,"Offtime for MIDI")
-    ADD_PARAM(PARAM_DEFAULT ,"qcw_ramp"        , param.qcw_ramp                , TYPE_UNSIGNED ,1      ,10     ,callback_ConfigFunction     ,"QCW Ramp Inc/93us")
-    ADD_PARAM(PARAM_DEFAULT ,"qcw_repeat"      , param.qcw_repeat              , TYPE_UNSIGNED ,0      ,1000   ,callback_ConfigFunction     ,"QCW pulse repeat time [ms] <100=single shot")
-    ADD_PARAM(PARAM_CONFIG  ,"watchdog"        , configuration.watchdog        , TYPE_UNSIGNED ,0      ,1      ,callback_ConfigFunction     ,"Watchdog Enable")
+    ADD_PARAM(PARAM_DEFAULT ,"tune_pw"         , param.tune_pw                 , TYPE_UNSIGNED ,0      ,800    ,NULL                        ,"Tune pulsewidth")
+    ADD_PARAM(PARAM_DEFAULT ,"tune_delay"      , param.tune_delay              , TYPE_UNSIGNED ,1      ,200    ,NULL                        ,"Tune delay")
+    ADD_PARAM(PARAM_CONFIG  ,"offtime"         , param.offtime                 , TYPE_UNSIGNED ,2      ,250    ,callback_OfftimeFunction    ,"Offtime for MIDI")
+    ADD_PARAM(PARAM_DEFAULT ,"qcw_ramp"        , param.qcw_ramp                , TYPE_UNSIGNED ,1      ,10     ,NULL                        ,"QCW Ramp Inc/93us")
+    ADD_PARAM(PARAM_DEFAULT ,"qcw_repeat"      , param.qcw_repeat              , TYPE_UNSIGNED ,0      ,1000   ,NULL                        ,"QCW pulse repeat time [ms] <100=single shot")
+    ADD_PARAM(PARAM_CONFIG  ,"watchdog"        , configuration.watchdog        , TYPE_UNSIGNED ,0      ,1      ,NULL                        ,"Watchdog Enable")
     ADD_PARAM(PARAM_CONFIG  ,"max_tr_pw"       , configuration.max_tr_pw       , TYPE_UNSIGNED ,0      ,3000   ,callback_ConfigFunction     ,"Maximum TR PW [uSec]")
     ADD_PARAM(PARAM_CONFIG  ,"max_tr_prf"      , configuration.max_tr_prf      , TYPE_UNSIGNED ,0      ,3000   ,callback_ConfigFunction     ,"Maximum TR frequency [Hz]")
     ADD_PARAM(PARAM_CONFIG  ,"max_qcw_pw"      , configuration.max_qcw_pw      , TYPE_UNSIGNED ,0      ,30000  ,callback_ConfigFunction     ,"Maximum QCW PW [uSec*10]")
     ADD_PARAM(PARAM_CONFIG  ,"max_tr_current"  , configuration.max_tr_current  , TYPE_UNSIGNED ,0      ,1000   ,callback_ConfigFunction     ,"Maximum TR current [A]")
     ADD_PARAM(PARAM_CONFIG  ,"min_tr_current"  , configuration.min_tr_current  , TYPE_UNSIGNED ,0      ,1000   ,callback_ConfigFunction     ,"Minimum TR current [A]")
     ADD_PARAM(PARAM_CONFIG  ,"max_qcw_current" , configuration.max_qcw_current , TYPE_UNSIGNED ,0      ,1000   ,callback_ConfigFunction     ,"Maximum QCW current [A]")
-    ADD_PARAM(PARAM_CONFIG  ,"temp1_max"       , configuration.temp1_max       , TYPE_UNSIGNED ,0      ,100    ,callback_ConfigFunction     ,"Max temperature 1 [*C]")
-    ADD_PARAM(PARAM_CONFIG  ,"temp2_max"       , configuration.temp2_max       , TYPE_UNSIGNED ,0      ,100    ,callback_ConfigFunction     ,"Max temperature 2 [*C]")
+    ADD_PARAM(PARAM_CONFIG  ,"temp1_max"       , configuration.temp1_max       , TYPE_UNSIGNED ,0      ,100    ,NULL                        ,"Max temperature 1 [*C]")
+    ADD_PARAM(PARAM_CONFIG  ,"temp2_max"       , configuration.temp2_max       , TYPE_UNSIGNED ,0      ,100    ,NULL                        ,"Max temperature 2 [*C]")
     ADD_PARAM(PARAM_CONFIG  ,"ct1_ratio"       , configuration.ct1_ratio       , TYPE_UNSIGNED ,1      ,2000   ,callback_ConfigFunction     ,"CT1 [N Turns]")
     ADD_PARAM(PARAM_CONFIG  ,"ct2_ratio"       , configuration.ct2_ratio       , TYPE_UNSIGNED ,1      ,2000   ,callback_ConfigFunction     ,"CT2 [N Turns]")
     ADD_PARAM(PARAM_CONFIG  ,"ct3_ratio"       , configuration.ct3_ratio       , TYPE_UNSIGNED ,1      ,2000   ,callback_ConfigFunction     ,"CT3 [N Turns]")
@@ -171,32 +169,33 @@ parameter_entry confparam[] = {
     ADD_PARAM(PARAM_CONFIG  ,"start_cycles"    , configuration.start_cycles    , TYPE_UNSIGNED ,0      ,20     ,callback_ConfigFunction     ,"Start Cyles [N]")
     ADD_PARAM(PARAM_CONFIG  ,"max_tr_duty"     , configuration.max_tr_duty     , TYPE_UNSIGNED ,1      ,500    ,callback_ConfigFunction     ,"Max TR duty cycle [0.1% incr]")
     ADD_PARAM(PARAM_CONFIG  ,"max_qcw_duty"    , configuration.max_qcw_duty    , TYPE_UNSIGNED ,1      ,500    ,callback_ConfigFunction     ,"Max QCW duty cycle [0.1% incr]")
-    ADD_PARAM(PARAM_CONFIG  ,"temp1_setpoint"  , configuration.temp1_setpoint  , TYPE_UNSIGNED ,0      ,100    ,callback_ConfigFunction     ,"Setpoint for fan [*C]")
-    ADD_PARAM(PARAM_CONFIG  ,"ext_trig_enable" , configuration.ext_trig_enable , TYPE_UNSIGNED ,0      ,1      ,callback_ConfigFunction     ,"External trigger enable [0-1]")
-    ADD_PARAM(PARAM_CONFIG  ,"batt_lockout_v"  , configuration.batt_lockout_v  , TYPE_UNSIGNED ,0      ,500    ,callback_ConfigFunction     ,"Battery lockout voltage [V]")
+    ADD_PARAM(PARAM_CONFIG  ,"temp1_setpoint"  , configuration.temp1_setpoint  , TYPE_UNSIGNED ,0      ,100    ,NULL                        ,"Setpoint for fan [*C]")
+    ADD_PARAM(PARAM_CONFIG  ,"batt_lockout_v"  , configuration.batt_lockout_v  , TYPE_UNSIGNED ,0      ,500    ,NULL                        ,"Battery lockout voltage [V]")
     ADD_PARAM(PARAM_CONFIG  ,"slr_fswitch"     , configuration.slr_fswitch     , TYPE_UNSIGNED ,0      ,1000   ,callback_ConfigFunction     ,"SLR switch frequency [Hz*100]")
-    ADD_PARAM(PARAM_CONFIG  ,"slr_vbus"        , configuration.slr_vbus        , TYPE_UNSIGNED ,0      ,1000   ,callback_ConfigFunction     ,"SLR Vbus [V]")
+    ADD_PARAM(PARAM_CONFIG  ,"slr_vbus"        , configuration.slr_vbus        , TYPE_UNSIGNED ,0      ,1000   ,NULL                        ,"SLR Vbus [V]")
     ADD_PARAM(PARAM_CONFIG  ,"ps_scheme"       , configuration.ps_scheme       , TYPE_UNSIGNED ,0      ,4      ,callback_ConfigFunction     ,"Power supply sheme")
-    ADD_PARAM(PARAM_CONFIG  ,"autotune_s"      , configuration.autotune_s      , TYPE_UNSIGNED ,1      ,32     ,callback_ConfigFunction     ,"Number of samples for Autotune")
-    ADD_PARAM(PARAM_CONFIG  ,"ud_name"         , configuration.ud_name         , TYPE_STRING   ,0      ,0      ,callback_ConfigFunction     ,"Name of the Coil [15 chars]")
+    ADD_PARAM(PARAM_CONFIG  ,"autotune_s"      , configuration.autotune_s      , TYPE_UNSIGNED ,1      ,32     ,NULL                        ,"Number of samples for Autotune")
+    ADD_PARAM(PARAM_CONFIG  ,"ud_name"         , configuration.ud_name         , TYPE_STRING   ,0      ,0      ,NULL                        ,"Name of the Coil [15 chars]")
+    ADD_PARAM(PARAM_DEFAULT ,"ip_addr"         , configuration.ip_addr         , TYPE_STRING   ,0      ,0      ,NULL                        ,"IP-Adress of the ESP8266")
 };
 
-command_entry commands[] =
-	{
-        {"help"		        ,commandHelp        ,"this text" },
- 		{"get"		        ,commandGet         ,"usage get [param]" },
- 		{"set"		        ,commandSet         ,"usage set [param] [value]" },
-        {"tr"		        ,command_tr         ,"Transient [start/stop]" },
-        {"kill"		        ,command_udkill     ,"Kills all UD Coils" },        
-        {"eeprom"		    ,command_eprom      ,"Save/Load config [load/save]" },
-        {"status"		    ,command_status     ,"Displays coil status" },
-        {"cls"		        ,command_cls        ,"Clear screen" },
-        {"tune_p"	        ,command_tune_p     ,"Autotune Primary" },
-        {"tune_s"	        ,command_tune_s     ,"Autotune Secondary" },
-        {"tasks"	        ,command_tasks      ,"Show running Tasks" },
-        {"bootloader"       ,command_bootloader ,"Start bootloader" },
-        {"qcw"              ,command_qcw        ,"qcw [start/stop]" },
-        {"bus"              ,command_bus        ,"bus [on/off]" },
+command_entry commands[] = {
+    ADD_COMMAND("bootloader"    ,command_bootloader     ,"Start bootloader")
+    ADD_COMMAND("bus"           ,command_bus            ,"Bus [on/off]")
+    ADD_COMMAND("cls"		    ,command_cls            ,"Clear screen")
+    ADD_COMMAND("eeprom"	    ,command_eprom          ,"Save/Load config [load/save]")
+	ADD_COMMAND("get"		    ,commandGet             ,"Usage get [param]")
+    ADD_COMMAND("help"          ,commandHelp            ,"This text")
+    ADD_COMMAND("kill"		    ,command_udkill         ,"Kills all UD Coils") 
+    ADD_COMMAND("load_default"  ,command_load_default   ,"Loads the default parameters")
+    ADD_COMMAND("qcw"           ,command_qcw            ,"QCW [start/stop]")
+    ADD_COMMAND("reset"         ,command_reset          ,"Resets UD3")
+	ADD_COMMAND("set"		    ,commandSet             ,"Usage set [param] [value]")
+    ADD_COMMAND("status"	    ,command_status         ,"Displays coil status")
+    ADD_COMMAND("tasks"	        ,command_tasks          ,"Show running Tasks")
+    ADD_COMMAND("tr"		    ,command_tr             ,"Transient [start/stop]")
+    ADD_COMMAND("tune_p"	    ,command_tune_p         ,"Autotune Primary")
+    ADD_COMMAND("tune_s"	    ,command_tune_s         ,"Autotune Secondary")        
 };
 // clang-format on
     
@@ -260,6 +259,18 @@ uint8_t command_bus(char *commandline, uint8_t port) {
 
 	return 1;
 }
+
+uint8_t command_load_default(char *commandline, uint8_t port) {
+    send_string("Default parameters loaded\r\n", port);
+    init_config();
+    return 1;
+}
+
+uint8_t command_reset(char *commandline, uint8_t port){
+    CySoftwareReset();
+    return 1;
+}
+
 
 uint8_t command_status(char *commandline, uint8_t port) {
 	static xTaskHandle overlay_Serial_TaskHandle;
@@ -458,9 +469,10 @@ uint8_t command_tasks(char *commandline, uint8_t port) {
 	    send_string("**********************************************\n\r", port);
         vTaskGetRunTimeStats( buff );
         send_string(buff, port);
-        send_string("**********************************************\n\r", port);
-	    return 0;
-
+        send_string("**********************************************\n\r\r\n", port);
+        sprintf(buff, "Free heap: %d\r\n",xPortGetFreeHeapSize());
+        send_string(buff,port);
+        return 0;
     #endif
     
     #if !configUSE_STATS_FORMATTING_FUNCTIONS && !configUSE_TRACE_FACILITY
