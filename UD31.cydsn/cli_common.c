@@ -46,6 +46,7 @@
 #include "tsk_priority.h"
 #include "tsk_uart.h"
 #include "tsk_usb.h"
+#include "teslaterm.h"
 
 #define UNUSED_VARIABLE(N) \
 	do {                   \
@@ -83,11 +84,14 @@ uint8_t command_bootloader(char *commandline, uint8_t port);
 uint8_t command_qcw(char *commandline, uint8_t port);
 uint8_t command_bus(char *commandline, uint8_t port);
 uint8_t command_load_default(char *commandline, uint8_t port);
+uint8_t command_tterm(char *commandline, uint8_t port);
 uint8_t command_reset(char *commandline, uint8_t port);
 
 void nt_interpret(const char *text, uint8_t port);
 
 const uint8_t kill_msg[3] = {0xb0, 0x77, 0x00};
+
+uint8_t term_mode = TERM_MODE_VT100;
 
 uint8_t tr_running = 0;
 TimerHandle_t xQCW_Timer;
@@ -196,6 +200,7 @@ command_entry commands[] = {
     ADD_COMMAND("tr"		    ,command_tr             ,"Transient [start/stop]")
     ADD_COMMAND("tune_p"	    ,command_tune_p         ,"Autotune Primary")
     ADD_COMMAND("tune_s"	    ,command_tune_s         ,"Autotune Secondary")        
+    ADD_COMMAND("tterm"	        ,command_tterm          ,"Changes terminal mode")
 };
 // clang-format on
     
@@ -214,7 +219,7 @@ uint8_t callback_TuneFunction(parameter_entry * params, uint8_t index, uint8_t p
 
 uint8_t callback_TRFunction(parameter_entry * params, uint8_t index, uint8_t port) {
 	interrupter.pw = param.pw;
-	interrupter.prd = param.pw;
+	interrupter.prd = param.pwd;
 	if (tr_running) {
 		update_interrupter();
 	}
@@ -271,10 +276,11 @@ uint8_t command_reset(char *commandline, uint8_t port){
     return 1;
 }
 
+xTaskHandle overlay_Serial_TaskHandle;
+xTaskHandle overlay_USB_TaskHandle;
 
 uint8_t command_status(char *commandline, uint8_t port) {
-	static xTaskHandle overlay_Serial_TaskHandle;
-	static xTaskHandle overlay_USB_TaskHandle;
+	
 	if (*commandline == 0x20 && commandline != 0)
 		commandline++; //skip space
 
@@ -318,6 +324,72 @@ uint8_t command_status(char *commandline, uint8_t port) {
 	}
 
 	return 1;
+}
+
+uint8_t command_tterm(char *commandline, uint8_t port){
+    if (*commandline == 0x20 && commandline != 0)
+		commandline++; //skip space
+
+	if (*commandline == 0 || commandline == 0) { //no param --> show help text
+
+		Term_Color_Red(port);
+		send_string("Usage: status [start|stop]\r\n", port);
+		Term_Color_White(port);
+		return 1;
+	}
+
+	if (strcmp(commandline, "start") == 0) {
+        send_gauge_config(0,0,600,"Bus Voltage", port);
+        send_gauge_config(1,0,100,"Temperature", port);
+        send_gauge_config(2,0,10000,"Power", port);
+        send_gauge_config(3,0,50,"Current", port);
+        send_gauge_config(4,0,1000,"Primary Curr.", port);
+        send_gauge_config(5,0,4,"Voices", port);
+        send_gauge_config(6,0,255,"DAC Value", port);
+        
+        send_chart_config(0,0,600,0,TT_UNIT_V,"Bus Voltage",port);
+        send_chart_config(1,0,100,0,TT_UNIT_C,"Temperature",port);
+        send_chart_config(2,0,1000,0,TT_UNIT_A,"Primary Curr.",port);
+        send_chart_config(3,0,10000,0,TT_UNIT_W,"Power",port);
+        
+        send_chart(0, telemetry.bus_v, port);
+        send_chart(1, telemetry.temp1, port);
+        send_chart(2, telemetry.primary_i, port);
+        send_chart(3, telemetry.avg_power, port);
+        switch (port) {
+		case SERIAL:
+			if (overlay_Serial_TaskHandle == NULL) {
+				xTaskCreate(tsk_overlay_TaskProc, "Overl_S", 256, (void *)SERIAL, PRIO_OVERLAY, &overlay_Serial_TaskHandle);
+			}
+			break;
+		case USB:
+			if (overlay_USB_TaskHandle == NULL) {
+				xTaskCreate(tsk_overlay_TaskProc, "Overl_U", 256, (void *)USB, PRIO_OVERLAY, &overlay_USB_TaskHandle);
+			}
+			break;
+		}
+
+        term_mode = port;
+	}
+	if (strcmp(commandline, "stop") == 0) {
+        term_mode = TERM_MODE_VT100;
+        switch (port) {
+		case SERIAL:
+			if (overlay_Serial_TaskHandle != NULL) {
+				vTaskDelete(overlay_Serial_TaskHandle);
+				overlay_Serial_TaskHandle = NULL;
+			}
+			break;
+		case USB:
+			if (overlay_USB_TaskHandle != NULL) {
+				vTaskDelete(overlay_USB_TaskHandle);
+				overlay_Serial_TaskHandle = NULL;
+			}
+			break;
+		}
+	} 
+    
+    
 }
 
 

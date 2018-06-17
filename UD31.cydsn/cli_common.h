@@ -36,6 +36,9 @@
 #define MODE_CLASSIC 1
 #define MODE_UDCLASSIC 2
 
+#define TERM_MODE_VT100 0xFF
+
+
 #define fan_controller 1  //enables fan controller
 #define auto_charge_bus 0 //enables auto charging of DC bus on start up (no wait for command)
 #define auto_charge_battery 0
@@ -44,6 +47,8 @@
 
 
 uint8_t input_handle();
+
+extern uint8_t term_mode;
 
 void nt_interpret(const char *text, uint8_t port);
 void init_config();
